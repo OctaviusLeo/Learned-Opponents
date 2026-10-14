@@ -1,0 +1,24 @@
+# Training configuration (Configured_Values).
+# Read by train/train.py (owner-implemented [ME]). Both variants train under
+# the identical training_budget_steps.
+
+training_budget_steps: 50000000   # Training_Budget: total env steps per run
+num_parallel_envs: 2048           # >= 1024 parallel environments on the GPU
+
+ppo:
+  lr: 3.0e-4
+  clip: 0.2                       # PPO clipping epsilon
+  entropy_coeff: 0.0025
+  batch_size: 32768               # rollout batch (num_envs * rollout_len)
+  minibatch_size: 8192
+  epochs: 4                       # optimization epochs per update
+  gamma: 0.99                     # discount factor
+  gae_lambda: 0.95                # GAE lambda
+
+policy:
+  hidden_sizes: [256, 256]        # MLP hidden layer sizes
+
+seeds:
+  # >= 3 seeds per variant; both variants use the same training budget.
+  baseline: [0, 1, 2]
+  randomized: [10, 11, 12]

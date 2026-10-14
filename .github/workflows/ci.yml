@@ -1,0 +1,31 @@
+name: CI
+
+# Runs the pure-Python logic via pytest on every push and pull request.
+# GPU training and the game run locally on the owner's machine (not in hosted
+# CI) because this runner has no NVIDIA GPU / RTX 3080, no CUDA, and no Unreal/
+# Godot engine. Their results are recorded with command/seed/commit instead.
+# The `gpu` extras are intentionally NOT installed here.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project + test deps (no gpu extras)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[test]"
+
+      - name: Run pytest
+        # A failing pytest fails the job (default behavior; no "|| true").
+        run: pytest

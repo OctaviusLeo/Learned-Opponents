@@ -1,0 +1,40 @@
+# === Secrets / credentials (never commit) ===
+.env
+*.env
+.env.*
+*.key
+*.pem
+secrets.yaml
+*.token
+*token*.txt
+
+# === Python junk ===
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.hypothesis/
+*.egg-info/
+build/
+dist/
+.eggs/
+.mypy_cache/
+.ruff_cache/
+
+# === Generated heavy artifacts ===
+# Ignore everything under runs/ except the tracked placeholder.
+runs/**
+!runs/.gitkeep
+
+# Large model checkpoints / exports (never tracked).
+*.ckpt
+*.pt
+*.onnx
+
+# === OS / editor files ===
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.idea/
+.vscode/

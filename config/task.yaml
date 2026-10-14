@@ -1,0 +1,33 @@
+# Task / environment configuration (Configured_Values).
+# These values define the navigation task and the Obs_Action_Spec inputs.
+# Keep consistent with config/domain_rand.yaml (nominal values must match
+# where they overlap).
+
+# --- Sensing ---
+n_rays: 16                 # N_rays: number of rangefinder rays in the Observation
+max_range_m: 5.0           # ray max range in meters; rays normalized to [0,1] by this
+
+# --- Robot / actuation ---
+max_wheel_speed: 10.0      # rad/s; wheel-velocity actions in [-1,1] map to +/- this
+
+# --- Arena ---
+# arena_diagonal_m is derived from arena size: sqrt(width^2 + height^2).
+arena:
+  width_m: 10.0
+  height_m: 10.0           # diagonal = sqrt(10^2 + 10^2) = 14.142135... m
+
+# --- Episode / success ---
+arrival_tolerance_m: 0.3   # success when within this distance of the goal
+episode_limit: 1000        # max steps before timeout termination
+
+# --- Reward weights (weighted sum of terms) ---
+reward:
+  w_progress: 1.0          # reward for progress toward the goal
+  w_success: 100.0         # bonus on reaching the goal
+  w_collision: -50.0       # penalty on collision
+  w_control: -0.01         # optional: penalize large wheel commands
+  w_time: -0.001           # optional: per-step time penalty
+
+# --- Evaluation ---
+nominal_success_target: 0.8   # target success rate at nominal params, in [0,1]
+eval_episodes: 200            # episodes per nominal evaluation
