@@ -31,12 +31,19 @@ The task needs **thousands of parallel environments** and **range (ray) sensors*
 
 If the chosen framework is MJX, the smoke test runs with `JAX_DEFAULT_MATMUL_PRECISION=highest` and records it (Requirement 1.5, 0.10).
 
-> **M0 outcome (filled in after the smoke test runs on the target machine):**
-> - Chosen framework: _TBD — recorded here and justified from the Smoke_Test evidence (Requirement 1.4)._
-> - Measured evidence: _parallel-environment count, step throughput (steps/s), and confirmation that Range_Rays were returned — paths into `docs/ENVIRONMENT.md`._
-> - If both frameworks fail: _per-framework first-failing condition recorded in `docs/ENVIRONMENT.md` (Requirement 1.6)._
+> **M0 outcome (measured on this desktop, RTX 3080 in WSL2):**
+> - Command: `bash scripts/smoke_test.sh` (defaults `NUM_ENVS=4096 STEPS=200`, 3 timed repetitions after warm-up), seed 0 for start poses and wheel commands, commit `a7c5aec6769299913c1e38f8950bdbdea072d269`. Raw result: `results/smoke_result.json`; generated table and both `nvidia-smi` captures: `docs/ENVIRONMENT.md` ("M0 smoke test"); logs: `docs/evidence/smoke_mjx.log`, `docs/evidence/smoke_mjlab.log`; versions: `docs/evidence/freeze_lo-mjx.txt`, `docs/evidence/freeze_lo-mjlab.txt`.
+> - **Chosen framework: mjlab (MuJoCo Warp)** (Requirement 1.4). Both frameworks passed every smoke-test condition, so the selection rule falls to throughput: MuJoCo Warp stepped **1,713,585** environment steps/s versus **336,509** for MJX-JAX, both at **4096** parallel environments with 24 rangefinders plus one miss probe per environment.
+> - Range_Rays: both returned a `(4096, 25)` sensor block on every one of the 200 checked steps (24 rays + the upward miss probe); every ray hit a wall or obstacle; no reading was at or below the chassis radius (no self-hits). The miss probe read exactly `-1.0` in both, which is the miss value the Obs_Action_Spec maps to `max_range_m`.
+> - ONNX path (tie-break only, not needed): both passed, max abs difference 6.7e-8 (torch.onnx.export of an rsl-rl style actor) and 1.2e-7 (onnx.helper graph from Brax PPO weights).
+> - MJX ran with `JAX_DEFAULT_MATMUL_PRECISION=highest` (Requirement 1.5) and `XLA_PYTHON_CLIENT_PREALLOCATE=false` (WSL2 rejects multi-GB single allocations). Because MJX was not chosen, Requirements 0.10 and 4.7 do not apply to training.
 
-**Rationale (to be confirmed by evidence, not assumed):** MJX is first-considered because Playground ships a documented navigation/locomotion example set and a known RTX-30-series precision workaround; mjlab (MuJoCo Warp) is the alternative if Warp's kernel parallelism gives materially higher throughput for the ray-sensor workload on this card. The decision is made from the measured smoke-test throughput, not from reputation.
+**Rationale (confirmed by evidence):** MJX was first-considered because Playground ships documented examples and a known RTX-30-series precision workaround; mjlab (MuJoCo Warp) was the alternative if Warp's kernel parallelism gave materially higher throughput for the ray-sensor workload on this card. It did, by 5.1x, on an identical arena. A second, qualitative finding points the same way: MJX-JAX 3.16.0 has no cylinder ray routine (cylinders are invisible to its rangefinders), while MuJoCo Warp 3.11.0 ray-casts cylinders, so the design's cylinder obstacles stay cylinders.
+
+**Consequences of the choice for the rest of the design:**
+- The simulator is `mjlab.sim.Simulation` (batched MuJoCo Warp worlds with per-world model fields and CUDA-graph stepping). The navigation environment is a torch-vectorized `rsl_rl` `VecEnv` written in this repository on top of it.
+- PPO is `rsl_rl` 5.4.2 (`OnPolicyRunner`, `PPO`, `MLPModel` with a state-independent `GaussianDistribution`). The policy's deterministic action is the Gaussian mean, clipped to [-1, 1] by the environment; learned observation normalization (`EmpiricalNormalization`) lives inside the policy.
+- Export uses `torch.onnx.export` of normalizer + MLP + clip.
 
 **Requirements coverage:** Requirement 1 (1.1–1.6), 0.10.
 

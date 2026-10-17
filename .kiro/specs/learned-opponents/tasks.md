@@ -69,8 +69,8 @@ flowchart TD
   - Demo/verify: `ls -R` shows the full layout; `git remote -v` shows the remote; `git check-ignore` confirms secret files are ignored.
   - _Requirements: 0.5, 0.6, 0.7, 0.8, 0.10, 11.1_
 
-- [ ] 2. Run the GPU framework smoke test and record the environment
-  - [ ] 2.1 Prepare the repository and implement `scripts/smoke_test.sh` (run inside WSL) (_Requirements: 1.1, 1.2, 1.3, 1.5_).
+- [x] 2. Run the GPU framework smoke test and record the environment
+  - [x] 2.1 Prepare the repository and implement `scripts/smoke_test.sh` (run inside WSL) (_Requirements: 1.1, 1.2, 1.3, 1.5_).
     - Extend `.gitignore` with the Unreal and Python outputs listed in the design (`Binaries/`, `Intermediate/`, `Saved/`, `DerivedDataCache/`, `*.sln`, `.vs/`, `__pycache__/`, `runs/`); add `.gitattributes` with `*.sh`, `*.py`, `*.yaml`, `*.yml`, `*.md`, `*.json` set to `text eol=lf`; if `THIRD_PARTY.md` exists only under `docs/`, move it to the repository root.
     - Create two uv virtual environments on the Linux filesystem: `~/.venvs/lo-mjx` (MuJoCo Playground with `jax[cuda12]`, as its README instructs) and `~/.venvs/lo-mjlab` (mjlab with its CUDA PyTorch extra). Record every installed version (`uv pip freeze`) in `docs/evidence/`.
     - For each framework, the script builds a minimal arena (primitive geoms only) with a differential-drive robot carrying `n_rays` rangefinders, steps ≥1024 parallel environments on the GPU for at least 200 steps, asserts a Range_Rays block of shape `(num_envs, n_rays)` every step, measures environment steps per second after warm-up, and proves the miss value of a rangefinder that hits nothing. The MJX run exports `JAX_DEFAULT_MATMUL_PRECISION=highest` first.
@@ -78,13 +78,13 @@ flowchart TD
     - Capture `nvidia-smi` on Windows and inside WSL into `docs/ENVIRONMENT.md`. Write `results/smoke_result.json` with, per framework: pass/fail per condition, parallel count, steps/s, versions, the command, and the commit.
     - If both frameworks fail, record each one's first-failing condition in `docs/ENVIRONMENT.md` and exit non-zero (_Requirements: 1.6_).
     - _Requirements: 1.1, 1.2, 1.3, 1.5, 1.6, 0.10_
-  - [ ] 2.2 Run the smoke test, choose the framework, and create the project environment
+  - [x] 2.2 Run the smoke test, choose the framework, and create the project environment
     - Run `scripts/smoke_test.sh` detached and poll it. Apply the design's selection rule to `results/smoke_result.json`.
     - Create `~/.venvs/learned-opponents` for the chosen framework plus onnx, onnxruntime, pytest, hypothesis, pyyaml, matplotlib, numpy; pin exact versions in the repository's dependency file; add a GPU-free `requirements-ci.txt` for CI; record versions and licenses in `docs/ENVIRONMENT.md` and `THIRD_PARTY.md`.
     - Demo/verify: `docs/ENVIRONMENT.md` contains both `nvidia-smi` captures, the step throughput, the parallel-env count, confirmation that Range_Rays were returned, and the precision setting if MJX was chosen.
     - _Requirements: 1.2, 1.3, 1.5, 0.5, 0.6, 0.7, 0.10_
 
-- [ ] 3. Record the chosen framework and evidence in design.md
+- [x] 3. Record the chosen framework and evidence in design.md
   - Fill the "M0 outcome" block in `design.md` from `results/smoke_result.json`: chosen framework, measured parallel-env count and step throughput, confirmation Range_Rays were returned, and (if applicable) each framework's first-failing condition (_Requirements: 1.4_).
   - Add the generating command, seed, and full commit hash alongside any number cited (_Requirements: 0.1_).
   - Demo/verify: the `design.md` M0 section shows a concrete chosen framework with evidence paths that exist on disk.
