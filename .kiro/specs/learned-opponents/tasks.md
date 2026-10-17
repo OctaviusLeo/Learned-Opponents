@@ -120,7 +120,7 @@ flowchart TD
     - Confirm the ray count/shape, the known-distance ray, and the parallel-env count (single execution, marked `gpu`).
     - _Requirements: 3.6, 3.8_
 
-- [ ] 7. Implement the domain-randomization sampler
+- [x] 7. Implement the domain-randomization sampler
   - [x] 7.1 Implement `randomization/domain_rand.py` sampling mass, wheel friction, motor strength, sensor noise sigma, action latency, and observation latency at episode reset from `config/domain_rand.yaml` (write it with the design defaults) for the randomized variant; baseline leaves all at nominal; all draws derive from the run seed (_Requirements: 4.2, 0.2, 0.3_).
     - Demo/verify: sampling with a fixed seed twice yields identical draws; every draw sits inside its configured range; baseline draws equal nominal.
   - [x] 7.2 Write Hypothesis property tests for randomization bounds and reproducibility
@@ -128,7 +128,7 @@ flowchart TD
     - **Property 8: Randomization is reproducible under a fixed seed** (≥100 iterations).
     - _Properties: 7, 8 — Requirements: 4.2, 0.3_
 
-- [ ] 7g. **Automated gate (M1):** run the full `pytest` in the project environment inside WSL (including `gpu` tests) and `pytest -m "not gpu"` with only `requirements-ci.txt` installed in a throwaway venv; proceed when both exit 0. No manual review stop.
+- [x] 7g. **Automated gate (M1):** run the full `pytest` in the project environment inside WSL (including `gpu` tests) and `pytest -m "not gpu"` with only `requirements-ci.txt` installed in a throwaway venv; proceed when both exit 0. No manual review stop.
 
 ### M2 — Baseline training
 
