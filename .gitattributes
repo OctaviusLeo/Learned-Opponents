@@ -1,0 +1,28 @@
+# Scripts written on Windows must still run in bash inside WSL, so text files
+# that bash, Python, or YAML parsers read are always checked out with LF.
+*.sh    text eol=lf
+*.py    text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.md    text eol=lf
+*.json  text eol=lf
+*.xml   text eol=lf
+*.toml  text eol=lf
+*.txt   text eol=lf
+
+# PowerShell and Unreal C++ sources keep Windows line endings.
+*.ps1   text eol=crlf
+*.cs    text eol=crlf
+*.cpp   text eol=crlf
+*.h     text eol=crlf
+*.ini   text eol=crlf
+*.uproject text eol=crlf
+
+# Binary artifacts.
+*.onnx  binary
+*.npy   binary
+*.npz   binary
+*.png   binary
+*.gif   binary
+*.umap  binary
+*.uasset binary

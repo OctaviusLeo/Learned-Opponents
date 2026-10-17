@@ -27,10 +27,24 @@ dist/
 runs/**
 !runs/.gitkeep
 
-# Large model checkpoints / exports (never tracked).
+# Large model checkpoints / exports (never tracked), except the small
+# exported policies under results/models/ (design "Export").
 *.ckpt
 *.pt
 *.onnx
+!results/models/*.onnx
+
+# === Unreal Engine build outputs (game/LearnedOpponents) ===
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+*.sln
+.vs/
+*.VC.db
+*.opensdf
+*.sdf
+*.suo
 
 # === OS / editor files ===
 .DS_Store
