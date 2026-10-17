@@ -1,14 +1,57 @@
 <!--
-  MuJoCo model placeholder for the differential-drive navigation robot.
+  Differential-drive navigation arena (template; filled by env/model.py from config/task.yaml).
 
-  Responsibility: define the robot body, differential-drive actuators, arena,
-  and MuJoCo rangefinder sensors that produce the N_rays Range_Rays block.
-
-  Requirements: 3.1, 3.6, 3.8.
-
-  TODO: owner/later task populates the actual MJCF model — see tasks.md tasks
-  5 and 6. This file is an intentional placeholder; it is NOT a valid model.
+  Contacts: only the wheels and casters touch the floor. Obstacles, walls, and the chassis
+  have no contact bits; collisions are decided from footprint geometry (env/obstacles.py),
+  and rangefinders ignore contact bits, so rays still hit obstacles and walls.
+  Friction: floor and casters have zero friction and condim 1, so MuJoCo's max-combination
+  gives the wheel-floor contact condim 3 and the wheel's (randomized) friction, and the
+  caster-floor contact is frictionless (a zero-friction condim-3 contact produces NaN).
+  Obstacles: each slot owns one box and one cylinder mocap body, compiled at the largest size;
+  per episode one of them is moved into the arena and resized, the other is parked below the floor.
 -->
-<mujoco model="learned-opponents-placeholder">
-  <!-- TODO: define option, worldbody, robot, actuators, and rangefinder sensors. -->
+<mujoco model="learned_opponents_nav">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="$physics_dt_s" integrator="implicitfast" cone="pyramidal"/>
+  <default>
+    <geom contype="0" conaffinity="0" condim="1" friction="0 0 0"/>
+  </default>
+  <asset>
+    <!-- MuJoCo ray filters index materials; colors also make captures readable. -->
+    <material name="floor" rgba="0.55 0.55 0.55 1"/>
+    <material name="wall" rgba="0.30 0.30 0.35 1"/>
+    <material name="obstacle" rgba="0.85 0.45 0.20 1"/>
+    <material name="robot" rgba="0.20 0.40 0.90 1"/>
+  </asset>
+  <worldbody>
+    <light pos="0 0 6" dir="0 0 -1"/>
+    <geom name="floor" type="plane" size="$floor_half $floor_half 0.1" material="floor" contype="1" conaffinity="1"/>
+$walls
+$obstacles
+    <body name="robot" pos="0 0 $wheel_radius_m">
+      <freejoint name="root"/>
+      <geom name="chassis" type="cylinder" size="$robot_radius_m 0.03" pos="0 0 0.05" mass="$chassis_mass_kg" material="robot"/>
+      <geom name="caster_f" type="sphere" size="0.02" pos="0.1 0 -0.03" mass="0.01" contype="1" conaffinity="1"/>
+      <geom name="caster_b" type="sphere" size="0.02" pos="-0.1 0 -0.03" mass="0.01" contype="1" conaffinity="1"/>
+$ray_sites
+      <body name="wheel_l" pos="0 $half_track 0">
+        <joint name="wheel_l" type="hinge" axis="0 1 0" damping="0.001"/>
+        <geom name="wheel_l" type="sphere" size="$wheel_radius_m" mass="$wheel_mass_kg" contype="1" conaffinity="1" condim="3" friction="$wheel_friction 0.005 0.0001" material="robot"/>
+      </body>
+      <body name="wheel_r" pos="0 -$half_track 0">
+        <joint name="wheel_r" type="hinge" axis="0 1 0" damping="0.001"/>
+        <geom name="wheel_r" type="sphere" size="$wheel_radius_m" mass="$wheel_mass_kg" contype="1" conaffinity="1" condim="3" friction="$wheel_friction 0.005 0.0001" material="robot"/>
+      </body>
+    </body>
+  </worldbody>
+  <contact>
+    <exclude body1="wheel_l" body2="wheel_r"/>
+  </contact>
+  <actuator>
+    <velocity name="wheel_l" joint="wheel_l" kv="$motor_kv" forcerange="-$motor_torque_limit_nm $motor_torque_limit_nm" ctrlrange="-$max_wheel_speed $max_wheel_speed"/>
+    <velocity name="wheel_r" joint="wheel_r" kv="$motor_kv" forcerange="-$motor_torque_limit_nm $motor_torque_limit_nm" ctrlrange="-$max_wheel_speed $max_wheel_speed"/>
+  </actuator>
+  <sensor>
+$rangefinders
+  </sensor>
 </mujoco>
