@@ -123,7 +123,7 @@ flowchart TD
 - [ ] 7. Implement the domain-randomization sampler
   - [x] 7.1 Implement `randomization/domain_rand.py` sampling mass, wheel friction, motor strength, sensor noise sigma, action latency, and observation latency at episode reset from `config/domain_rand.yaml` (write it with the design defaults) for the randomized variant; baseline leaves all at nominal; all draws derive from the run seed (_Requirements: 4.2, 0.2, 0.3_).
     - Demo/verify: sampling with a fixed seed twice yields identical draws; every draw sits inside its configured range; baseline draws equal nominal.
-  - [ ] 7.2 Write Hypothesis property tests for randomization bounds and reproducibility
+  - [x] 7.2 Write Hypothesis property tests for randomization bounds and reproducibility
     - **Property 7: Domain randomization samples within configured ranges** (≥100 iterations).
     - **Property 8: Randomization is reproducible under a fixed seed** (≥100 iterations).
     - _Properties: 7, 8 — Requirements: 4.2, 0.3_
