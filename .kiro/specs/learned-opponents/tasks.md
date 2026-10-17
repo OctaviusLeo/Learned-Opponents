@@ -114,7 +114,7 @@ flowchart TD
     - _Properties: 4, 5, 6 — Requirements: 3.1, 3.3, 3.4, 3.5, 3.7_
 
 - [ ] 6. Implement Range_Rays and GPU parallel stepping
-  - [ ] 6.1 Wire the rangefinder sensors per the Obs_Action_Spec ray layout so each Observation carries exactly `N_rays` readings, misses and self-hits mapped to `max_range_m`, and confirm the env steps on the GPU for at least the smoke-test parallel-env count (_Requirements: 3.6, 3.8_).
+  - [x] 6.1 Wire the rangefinder sensors per the Obs_Action_Spec ray layout so each Observation carries exactly `N_rays` readings, misses and self-hits mapped to `max_range_m`, and confirm the env steps on the GPU for at least the smoke-test parallel-env count (_Requirements: 3.6, 3.8_).
     - Demo/verify: a batched step over `num_parallel_envs` returns a Range_Rays block of shape `(num_parallel_envs, N_rays)` with values in `[0, max_range_m]`; a test scene with one wall at a known distance returns that distance on the expected ray index.
   - [ ] 6.2 Write a smoke/example test for parallel GPU stepping and ray shape
     - Confirm the ray count/shape, the known-distance ray, and the parallel-env count (single execution, marked `gpu`).

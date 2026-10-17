@@ -1,24 +1,36 @@
-# Training configuration (Configured_Values).
-# Read by train/train.py (owner-implemented [ME]). Both variants train under
-# the identical training_budget_steps.
+# Training configuration (Configured_Values) for rsl-rl PPO on the MuJoCo Warp
+# environment. Both variants use the identical budget and hyperparameters.
+# training_budget_steps and the PPO settings are chosen by the baseline pilot
+# (seed 100, never reported; task 8.3) and frozen before any reported run.
 
-training_budget_steps: 50000000   # Training_Budget: total env steps per run
-num_parallel_envs: 2048           # >= 1024 parallel environments on the GPU
+training_budget_steps: 100000000   # environment (control) steps per run, all worlds summed
+num_parallel_envs: 4096            # >= the 4096 worlds proven in the M0 smoke test
+max_minutes_per_run: 60
+bank_size: 262144                  # pre-sampled episode layouts / domain parameters per run
+device: cuda:0
 
 ppo:
-  lr: 3.0e-4
-  clip: 0.2                       # PPO clipping epsilon
-  entropy_coeff: 0.0025
-  batch_size: 32768               # rollout batch (num_envs * rollout_len)
-  minibatch_size: 8192
-  epochs: 4                       # optimization epochs per update
-  gamma: 0.99                     # discount factor
-  gae_lambda: 0.95                # GAE lambda
+  num_steps_per_env: 24            # rollout length per world per iteration
+  num_learning_epochs: 5
+  num_mini_batches: 4
+  learning_rate: 1.0e-3
+  schedule: adaptive               # KL-adaptive learning rate
+  desired_kl: 0.01
+  clip_param: 0.2
+  entropy_coef: 0.005
+  value_loss_coef: 1.0
+  max_grad_norm: 1.0
+  gamma: 0.99
+  lam: 0.95
+  use_clipped_value_loss: true
 
 policy:
-  hidden_sizes: [256, 256]        # MLP hidden layer sizes
+  hidden_sizes: [256, 256]
+  activation: elu
+  init_std: 1.0
+  obs_normalization: true          # EmpiricalNormalization inside the policy (exported with it)
 
 seeds:
-  # >= 3 seeds per variant; both variants use the same training budget.
   baseline: [0, 1, 2]
-  randomized: [10, 11, 12]
+  randomized: [0, 1, 2]
+  pilot: [100]                     # budget/hyperparameter pilot only, never reported

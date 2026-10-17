@@ -30,9 +30,11 @@ import mujoco
 import numpy as np
 import torch
 import warp as wp
-from mjlab.sim.sim import MujocoCfg, Simulation, SimulationCfg
 
-from learned_opponents.env import obstacles as obs_lib
+wp.config.quiet = True  # before mjlab imports initialize Warp
+from mjlab.sim.sim import MujocoCfg, Simulation, SimulationCfg  # noqa: E402
+
+from learned_opponents.env import obstacles as obs_lib  # noqa: E402
 from learned_opponents.env import rules
 from learned_opponents.env import torch_xp as txp
 from learned_opponents.env.model import box_body, build_mjcf, cyl_body, PARK_Z
@@ -173,7 +175,12 @@ class NavEnv:
         return q[:, 0:2], yaw, fwd, v[:, 5]
 
     def raw_rays(self) -> torch.Tensor:
+        """Rangefinder readings in metres, ray index order; -1 where a ray hits nothing."""
         return self.sim.data.sensordata[:, : self.n_rays]
+
+    def range_rays(self) -> torch.Tensor:
+        """Range_Rays block ``(num_envs, n_rays)`` in metres, misses mapped to ``max_range_m``."""
+        return spec.normalize_rays(txp, self.raw_rays(), self.cfg.max_range_m) * self.cfg.max_range_m
 
     def goal_distance(self, xy: torch.Tensor) -> torch.Tensor:
         return torch.linalg.vector_norm(self.goal - xy, dim=-1)
@@ -363,9 +370,56 @@ def _demo(device: str = "cuda:0") -> int:
     return 0 if all(ok) else 1
 
 
+def known_distance_layout(k: int, yaw: float = 0.0) -> obs_lib.Layouts:
+    """Robot at the origin; a 0.6 m box 2 m ahead (+x), a 0.4 m cylinder 1.5 m to the left
+    (+y), and a 0.3 m box 1 m to the right (-y). Expected ranges at yaw 0: ray 12 (ahead)
+    1.7 m, ray 18 (left) 1.3 m, ray 6 (right) 0.85 m, ray 0 (back) 4.0 m to the wall."""
+    kind = np.zeros((1, k), np.int8)
+    center = np.zeros((1, k, 2))
+    size = np.zeros((1, k))
+    for j, (kd, c, s) in enumerate([(obs_lib.BOX, (2.0, 0.0), 0.6), (obs_lib.CYLINDER, (0.0, 1.5), 0.4),
+                                    (obs_lib.BOX, (0.0, -1.0), 0.3)]):
+        kind[0, j], center[0, j], size[0, j] = kd, c, s
+    return obs_lib.Layouts(kind, center, size, np.array([[0.0, 0.0, yaw]]), np.array([[3.0, 3.0]]))
+
+
+def _rays_check(device: str = "cuda:0") -> int:
+    """Task 6.1 check: the batched Range_Rays block and one known-distance scene."""
+    from learned_opponents.config import load_task, load_yaml
+
+    task = load_task()
+    n = int(load_yaml("train.yaml")["num_parallel_envs"])
+    env = NavEnv(task, num_envs=n, seed=0, device=device, bank_size=n)
+    env.reset()
+    gen = torch.Generator(device=device).manual_seed(0)
+    for _ in range(10):
+        env.step(torch.rand((n, 2), generator=gen, device=device) * 2 - 1)
+    rays = env.range_rays()
+    ok_batch = tuple(rays.shape) == (n, env.n_rays) and bool(((rays >= 0) & (rays <= env.cfg.max_range_m)).all())
+    print(f"batched Range_Rays shape {tuple(rays.shape)}, range [{rays.min().item():.3f}, "
+          f"{rays.max().item():.3f}] m -> {'ok' if ok_batch else 'FAIL'}")
+
+    one = NavEnv(task, num_envs=1, seed=0, device=device, bank_size=1, auto_reset=False)
+    one.use_layouts(known_distance_layout(one.k))
+    one.reset()
+    r = one.range_rays()[0].cpu().numpy()
+    want = {12: 1.7, 18: 1.3, 6: 0.85, 0: 4.0}
+    ok_known = all(abs(r[i] - d) < 1e-3 for i, d in want.items())
+    for i, d in want.items():
+        print(f"ray {i:2d}: {r[i]:.4f} m (expected {d} m)")
+    print("known-distance scene ->", "ok" if ok_known else "FAIL")
+    return 0 if ok_batch and ok_known else 1
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--demo", action="store_true")
+    ap.add_argument("--demo", action="store_true", help="one episode per termination reason")
+    ap.add_argument("--rays", action="store_true", help="Range_Rays shape and known-distance check")
     ap.add_argument("--device", default="cuda:0")
     args = ap.parse_args()
-    raise SystemExit(_demo(args.device) if args.demo else 0)
+    status = 0
+    if args.demo:
+        status |= _demo(args.device)
+    if args.rays:
+        status |= _rays_check(args.device)
+    raise SystemExit(status)
