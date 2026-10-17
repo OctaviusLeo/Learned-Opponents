@@ -1,0 +1,9 @@
+# GPU-free test environment for CI (pytest -m "not gpu"). Exact pins; the
+# same versions are installed in ~/.venvs/learned-opponents.
+numpy==2.5.4
+pyyaml==6.0.3
+onnx==1.23.2
+onnxruntime==1.31.0
+matplotlib==3.11.2
+pytest==9.1.1
+hypothesis==6.170.1

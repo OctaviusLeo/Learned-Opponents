@@ -1,0 +1,97 @@
+/mnt/c/dev/Projects/Learned-Opponents/scripts/smoke/smoke_warp.py:153: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(actor, (obs[:1],), buf, input_names=["obs"], output_names=["action"],
+Warp 1.18.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.4
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 3080" (10 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/octaviusleo/.cache/warp/1.18.0
+Module mujoco_warp._src.smooth b9cc505 load on device 'cuda:0' took 5.38 ms  (cached)
+Module _nxn_broadphase__locals__kernel_5ea22428 5ea2242 load on device 'cuda:0' took 0.83 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_aa857f7d aa857f7 load on device 'cuda:0' took 1.13 ms  (cached)
+Module mujoco_warp._src.constraint 9435a53 load on device 'cuda:0' took 0.75 ms  (cached)
+Module _friction_dof__locals__kernel_eadd710f eadd710 load on device 'cuda:0' took 1.04 ms  (cached)
+Module _efc_contact_init__locals__kernel_574ccaaf 574ccaa load on device 'cuda:0' took 1.38 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_cf20828f 2cba4be load on device 'cuda:0' took 1.39 ms  (cached)
+Module _efc_contact_update__locals__kernel_7d5c4160 7d5c416 load on device 'cuda:0' took 0.87 ms  (cached)
+Module mujoco_warp._src.sensor 764597f load on device 'cuda:0' took 3.83 ms  (cached)
+Module mujoco_warp._src.ray b8099c3 load on device 'cuda:0' took 1.57 ms  (cached)
+Module mujoco_warp._src.forward f44d3e1 load on device 'cuda:0' took 2.34 ms  (cached)
+Module mujoco_warp._src.passive 80f3681 load on device 'cuda:0' took 2.45 ms  (cached)
+Module mujoco_warp._src.forward 0a75030 load on device 'cuda:0' took 1.31 ms  (cached)
+Module _qfrc_smooth__locals__kernel_8b823980 8b82398 load on device 'cuda:0' took 0.74 ms  (cached)
+Module mujoco_warp._src.support f39c2de load on device 'cuda:0' took 0.84 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_379cda95 6fb4a35 load on device 'cuda:0' took 134.46 ms  (cached)
+Module _solve_init_dof__locals__kernel_1d7ecfa4 1d7ecfa load on device 'cuda:0' took 0.87 ms  (cached)
+Module mujoco_warp._src.solver c97221b load on device 'cuda:0' took 2.31 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_318a98d8 318a98d load on device 'cuda:0' took 1.25 ms  (cached)
+Module mul_m_kernel__locals___mul_m_d74bd8d9 d74bd8d load on device 'cuda:0' took 1.25 ms  (cached)
+Module _update_constraint_efc__locals__kernel_4b172e8b 4b172e8 load on device 'cuda:0' took 0.88 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_c29c2cfc c29c2cf load on device 'cuda:0' took 0.89 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_93442399 9344239 load on device 'cuda:0' took 0.65 ms  (cached)
+Module _update_gradient_grad__locals__kernel_378e7517 378e751 load on device 'cuda:0' took 0.77 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_823f9ed6 0eaf922 load on device 'cuda:0' took 2.23 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_7f957d1a 8152e44 load on device 'cuda:0' took 86.72 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_07b6d583 17c364d load on device 'cuda:0' took 1.51 ms  (cached)
+Module _update_constraint_efc__locals__kernel_523090d1 523090d load on device 'cuda:0' took 0.82 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_f3231cfe f3231cf load on device 'cuda:0' took 0.85 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_721e3cea 721e3ce load on device 'cuda:0' took 1.06 ms  (cached)
+Module _update_gradient_grad__locals__kernel_5363029b 5363029 load on device 'cuda:0' took 0.93 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_3a372e62 d481a49 load on device 'cuda:0' took 87.30 ms  (cached)
+Module mujoco_warp._src.derivative 1d93a53 load on device 'cuda:0' took 1.77 ms  (cached)
+Module _next_time_builder__locals___next_time_f604e0b3 f604e0b load on device 'cuda:0' took 1.04 ms  (cached)
+{
+  "framework": "mjlab",
+  "implementation": "MuJoCo Warp (mujoco_warp, as driven by mjlab)",
+  "num_envs": 4096,
+  "n_steps": 200,
+  "conditions": {
+    "gpu_backend": true,
+    "steps_on_gpu_at_count": true,
+    "range_rays_every_step": true,
+    "miss_value_proven": true,
+    "no_self_hits": true,
+    "physics_finite": true,
+    "onnx_export_path": true
+  },
+  "versions": {
+    "mjlab": "1.6.0",
+    "mujoco": "3.11.0",
+    "mujoco-warp": "3.11.0",
+    "warp-lang": "1.18.0",
+    "torch": "2.14.1",
+    "rsl-rl-lib": "5.4.2",
+    "onnx": "1.23.2",
+    "onnxruntime": "1.31.0",
+    "onnxscript": "0.7.2",
+    "numpy": "2.5.4"
+  },
+  "warp_device": "cuda:0",
+  "torch_cuda": true,
+  "torch_device_name": "NVIDIA GeForce RTX 3080",
+  "sensordata_shape_per_step": [
+    4096,
+    25
+  ],
+  "ray_hit_range_m": [
+    0.6119940280914307,
+    6.325520038604736
+  ],
+  "ray_hit_fraction": 1.0,
+  "miss_value_observed": [
+    -1.0
+  ],
+  "robot_z_range_m": [
+    0.048600923269987106,
+    0.05071313679218292
+  ],
+  "wall_s": 1.434186569999838,
+  "env_steps_per_s": 1713584.586139499,
+  "onnx": {
+    "exporter": "torch.onnx.export (TorchScript exporter)",
+    "opset": 17,
+    "n_obs": 64,
+    "max_abs_diff": 6.705522537231445e-08
+  }
+}

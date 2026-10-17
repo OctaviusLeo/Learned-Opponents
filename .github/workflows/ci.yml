@@ -1,10 +1,9 @@
 name: CI
 
-# Runs the pure-Python logic via pytest on every push and pull request.
-# GPU training and the game run locally on the owner's machine (not in hosted
-# CI) because this runner has no NVIDIA GPU / RTX 3080, no CUDA, and no Unreal/
-# Godot engine. Their results are recorded with command/seed/commit instead.
-# The `gpu` extras are intentionally NOT installed here.
+# Runs the GPU-free pytest suite on every push (all branches) and pull request.
+# Training, the GPU environment tests (marked `gpu`), and the Unreal game run
+# locally on the RTX 3080 desktop; their results are recorded with command,
+# seed, and commit. A failing test fails the job (no `|| true`).
 
 on:
   push:
@@ -16,16 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
-      - name: Install project + test deps (no gpu extras)
+      - name: Install the GPU-free pins and this package
         run: |
           python -m pip install --upgrade pip
-          python -m pip install ".[test]"
+          python -m pip install -r requirements-ci.txt
+          python -m pip install --no-deps -e .
 
-      - name: Run pytest
-        # A failing pytest fails the job (default behavior; no "|| true").
-        run: pytest
+      - name: Run pytest (GPU-free tests)
+        run: pytest -m "not gpu"

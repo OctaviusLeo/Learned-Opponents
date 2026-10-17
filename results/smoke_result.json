@@ -1,0 +1,142 @@
+{
+  "chosen_framework": "mjlab",
+  "selection_rule": "eligible = all required conditions pass; choose max env_steps_per_s at the tested parallel count; tie -> working ONNX export path",
+  "required_conditions": [
+    "nvidia_smi_saved",
+    "gpu_backend",
+    "steps_on_gpu_at_count",
+    "range_rays_every_step",
+    "miss_value_proven",
+    "no_self_hits",
+    "physics_finite",
+    "versions_recorded"
+  ],
+  "command": "bash scripts/smoke_test.sh (NUM_ENVS=4096 STEPS=200)",
+  "commit": "a7c5aec6769299913c1e38f8950bdbdea072d269",
+  "seed": 0,
+  "frameworks": {
+    "mjx": {
+      "framework": "mjx",
+      "implementation": "MJX (JAX)",
+      "num_envs": 4096,
+      "n_steps": 200,
+      "conditions": {
+        "gpu_backend": true,
+        "steps_on_gpu_at_count": true,
+        "range_rays_every_step": true,
+        "miss_value_proven": true,
+        "no_self_hits": true,
+        "physics_finite": true,
+        "onnx_export_path": true,
+        "versions_recorded": true,
+        "nvidia_smi_saved": true
+      },
+      "versions": {
+        "playground": "0.2.0",
+        "mujoco": "3.16.0",
+        "mujoco-mjx": "3.16.0",
+        "jax": "0.11.2",
+        "jaxlib": "0.11.2",
+        "jax-cuda12-plugin": "0.11.2",
+        "jax-cuda12-pjrt": "0.11.2",
+        "brax": "0.14.2",
+        "flax": "0.12.10",
+        "onnx": "1.23.2",
+        "onnxruntime": "1.31.0",
+        "numpy": "2.5.4"
+      },
+      "env": {
+        "JAX_DEFAULT_MATMUL_PRECISION": "highest",
+        "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+      },
+      "jax_devices": [
+        "cuda:0"
+      ],
+      "jax_backend": "gpu",
+      "sensordata_shape_per_step": [
+        4096,
+        25
+      ],
+      "ray_hit_range_m": [
+        0.6014370322227478,
+        6.3376359939575195
+      ],
+      "ray_hit_fraction": 1.0,
+      "miss_value_observed": [
+        -1.0
+      ],
+      "robot_z_range_m": [
+        0.049040891230106354,
+        0.05095265060663223
+      ],
+      "wall_s": 7.303222440999889,
+      "env_steps_per_s": 336508.9889913758,
+      "onnx": {
+        "exporter": "onnx.helper graph from Brax PPO policy weights",
+        "opset": 17,
+        "n_obs": 64,
+        "max_abs_diff": 1.1920928955078125e-07
+      },
+      "passed": true,
+      "first_failing_condition": null
+    },
+    "mjlab": {
+      "framework": "mjlab",
+      "implementation": "MuJoCo Warp (mujoco_warp, as driven by mjlab)",
+      "num_envs": 4096,
+      "n_steps": 200,
+      "conditions": {
+        "gpu_backend": true,
+        "steps_on_gpu_at_count": true,
+        "range_rays_every_step": true,
+        "miss_value_proven": true,
+        "no_self_hits": true,
+        "physics_finite": true,
+        "onnx_export_path": true,
+        "versions_recorded": true,
+        "nvidia_smi_saved": true
+      },
+      "versions": {
+        "mjlab": "1.6.0",
+        "mujoco": "3.11.0",
+        "mujoco-warp": "3.11.0",
+        "warp-lang": "1.18.0",
+        "torch": "2.14.1",
+        "rsl-rl-lib": "5.4.2",
+        "onnx": "1.23.2",
+        "onnxruntime": "1.31.0",
+        "onnxscript": "0.7.2",
+        "numpy": "2.5.4"
+      },
+      "warp_device": "cuda:0",
+      "torch_cuda": true,
+      "torch_device_name": "NVIDIA GeForce RTX 3080",
+      "sensordata_shape_per_step": [
+        4096,
+        25
+      ],
+      "ray_hit_range_m": [
+        0.6119940280914307,
+        6.325520038604736
+      ],
+      "ray_hit_fraction": 1.0,
+      "miss_value_observed": [
+        -1.0
+      ],
+      "robot_z_range_m": [
+        0.048600923269987106,
+        0.05071313679218292
+      ],
+      "wall_s": 1.434186569999838,
+      "env_steps_per_s": 1713584.586139499,
+      "onnx": {
+        "exporter": "torch.onnx.export (TorchScript exporter)",
+        "opset": 17,
+        "n_obs": 64,
+        "max_abs_diff": 6.705522537231445e-08
+      },
+      "passed": true,
+      "first_failing_condition": null
+    }
+  }
+}

@@ -1,6 +1,4 @@
-# Private portfolio repo: not published to PyPI
-# No OSS license field and no PyPI packaging configuration are declared on
-# purpose. This repository stays private (portfolio rule 0.8-adjacent).
+# Private portfolio repository: no license field and no packaging for PyPI.
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -9,52 +7,49 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "learned-opponents"
 version = "0.0.0"
-description = "Learned Opponents: sim-trained navigation policies raced in-engine (private portfolio project)."
-requires-python = ">=3.11,<3.12"
-# NOTE: intentionally no `license` field and no OSS classifier. Private repo.
+description = "Learned Opponents: domain-randomized navigation policies trained in MuJoCo Warp and raced in Unreal (private portfolio project)."
+requires-python = ">=3.12,<3.13"
 
-# Pure-Python stack. Exact pins verified against PyPI for Python 3.11 on
-# 2025 (Windows dev box, Python 3.11.5). numpy is held at the last 2.4.x
-# release because 2.5.x drops Python 3.11 support (requires_python >=3.12).
+# GPU-free core: the spec, randomization, metrics, summary, plotting, and the
+# ONNX-fixture half of the parity test run with only these (CI installs the
+# same pins from requirements-ci.txt).
 dependencies = [
-    "numpy==2.4.6",
+    "numpy==2.5.4",
+    "pyyaml==6.0.3",
     "onnx==1.23.2",
     "onnxruntime==1.31.0",
-    "pyyaml==6.0.3",
     "matplotlib==3.11.2",
 ]
 
 [project.optional-dependencies]
-# Test/dev tooling. Installed in CI; see .github/workflows/ci.yml.
 test = [
     "pytest==9.1.1",
-    "hypothesis==6.169.0",
+    "hypothesis==6.170.1",
 ]
-
-# GPU / simulation stack. These CANNOT be installed or verified on the
-# Windows dev box; they must be proven on the owner's Ubuntu 24.04 + RTX 3080
-# machine (M0 smoke test, task 2 [ME]). Versions are TBD-to-be-proven-on-target
-# and recorded in docs/ENVIRONMENT.md and THIRD_PARTY.md once pinned there.
-# Do NOT treat the entries below as verified pins.
+# Training stack chosen by the M0 smoke test (results/smoke_result.json):
+# mjlab on MuJoCo Warp with PyTorch and rsl-rl PPO. Exact transitive pins
+# are in requirements-gpu.lock (uv pip freeze of ~/.venvs/learned-opponents).
 gpu = [
-    # "mujoco==TBD",            # proven on target (Apache-2.0)
-    # "mujoco-mjx==TBD",        # MJX; proven on target
-    # "playground==TBD",        # MuJoCo Playground; proven on target
-    # "jax[cuda12]==TBD",       # JAX + jaxlib (CUDA); proven on target
-    # "mujoco-warp==TBD",       # mjlab / MuJoCo Warp; proven on target
+    "mjlab[cu128]==1.6.0",
+    "mujoco==3.11.0",
+    "mujoco-warp==3.11.0",
+    "warp-lang==1.18.0",
+    "torch==2.14.1",
+    "rsl-rl-lib==5.4.2",
+    "tensordict==0.15.1",
+    "tensorboard==2.21.0",
 ]
 
 [tool.setuptools.packages.find]
 include = ["learned_opponents*"]
 
+[tool.setuptools.package-data]
+"learned_opponents.env" = ["*.xml"]
+
 [tool.pytest.ini_options]
 minversion = "9.0"
 testpaths = ["tests"]
 addopts = "-ra"
-# Collecting zero tests is acceptable while property tests are deferred.
-# A trivial sanity test keeps the suite non-empty and green.
-
-[tool.hypothesis]
-# Design Testing Strategy: >=100 iterations for Python property tests.
-# Profiles are selected inside tests; this documents the project default.
-max_examples = 100
+markers = [
+    "gpu: needs the GPU training stack (mjlab / MuJoCo Warp / torch); CI runs -m 'not gpu'",
+]

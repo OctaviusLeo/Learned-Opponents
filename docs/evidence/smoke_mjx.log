@@ -1,0 +1,61 @@
+{
+  "framework": "mjx",
+  "implementation": "MJX (JAX)",
+  "num_envs": 4096,
+  "n_steps": 200,
+  "conditions": {
+    "gpu_backend": true,
+    "steps_on_gpu_at_count": true,
+    "range_rays_every_step": true,
+    "miss_value_proven": true,
+    "no_self_hits": true,
+    "physics_finite": true,
+    "onnx_export_path": true
+  },
+  "versions": {
+    "playground": "0.2.0",
+    "mujoco": "3.16.0",
+    "mujoco-mjx": "3.16.0",
+    "jax": "0.11.2",
+    "jaxlib": "0.11.2",
+    "jax-cuda12-plugin": "0.11.2",
+    "jax-cuda12-pjrt": "0.11.2",
+    "brax": "0.14.2",
+    "flax": "0.12.10",
+    "onnx": "1.23.2",
+    "onnxruntime": "1.31.0",
+    "numpy": "2.5.4"
+  },
+  "env": {
+    "JAX_DEFAULT_MATMUL_PRECISION": "highest",
+    "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+  },
+  "jax_devices": [
+    "cuda:0"
+  ],
+  "jax_backend": "gpu",
+  "sensordata_shape_per_step": [
+    4096,
+    25
+  ],
+  "ray_hit_range_m": [
+    0.6014370322227478,
+    6.3376359939575195
+  ],
+  "ray_hit_fraction": 1.0,
+  "miss_value_observed": [
+    -1.0
+  ],
+  "robot_z_range_m": [
+    0.049040891230106354,
+    0.05095265060663223
+  ],
+  "wall_s": 7.303222440999889,
+  "env_steps_per_s": 336508.9889913758,
+  "onnx": {
+    "exporter": "onnx.helper graph from Brax PPO policy weights",
+    "opset": 17,
+    "n_obs": 64,
+    "max_abs_diff": 1.1920928955078125e-07
+  }
+}
