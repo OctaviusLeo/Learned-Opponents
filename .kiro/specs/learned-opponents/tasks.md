@@ -103,11 +103,11 @@ flowchart TD
     - **Property 2: Action layout conforms to the Obs_Action_Spec** (≥100 iterations).
     - _Properties: 1, 2 — Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 5. Implement the navigation environment
+- [x] 5. Implement the navigation environment
   - [x] 5.1 Implement `env/nav_env.py`, `env/model.xml`, and `env/obstacles.py` with the chosen framework: `reset`/`step`/reward/termination for the differential-drive robot in an arena with randomized primitive obstacles; reset places robot+goal and obstacles and returns the initial Observation; step applies wheel-velocity commands and returns next Observation/reward/termination; success within arrival tolerance, collision on robot contact with an obstacle or wall, timeout at the limit; reward is the configured weighted sum of progress/success/collision terms (_Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.7_).
     - Keep layout sampling, termination decision, and reward arithmetic as pure functions so CI can test them; also expose `reset_from_layout(layout)` so the transfer check can replay fixed layouts.
     - Demo/verify: a one-command headless rollout reaches a goal (success), hits an obstacle (collision), and times out, each tagged with the correct reason.
-  - [ ] 5.2 Write Hypothesis property tests for env reset, termination, and reward
+  - [x] 5.2 Write Hypothesis property tests for env reset, termination, and reward
     - **Property 4: Reset returns a valid initial observation** (≥100 iterations; marked `gpu` if it needs the simulator).
     - **Property 5: Termination is mutually exclusive and reason-tagged** (≥100 iterations).
     - **Property 6: Reward is a weighted sum of its configured terms** (≥100 iterations).
