@@ -268,9 +268,16 @@ These values are fixed before any reported training run and are read by both the
 | `robot_radius_m` | 0.15 | collision footprint |
 | `wheel_radius_m`, `track_width_m` | 0.05, 0.30 | |
 | `max_wheel_speed` | 20.0 rad/s | so `v_max` = 1.0 m/s, `omega_max` = 6.67 rad/s |
-| `n_rays`, `ray_fov_deg`, `ray_height_m` | 24, 360, 0.10 | |
+| `n_rays`, `ray_fov_deg`, `ray_height_m` | 24, 360, 0.15 | 0.15 m rather than 0.10 m: the 0.05 m-radius wheels top out at 0.10 m and are separate bodies, so a 0.10 m ray plane would graze them; the chassis (same body as the ray sites) is excluded by the rangefinder |
 | `max_range_m` | 4.0 | |
+| `chassis_mass_kg`, `wheel_mass_kg` | 2.0, 0.1 | nominal masses (scaled by `mass_scale`) |
+| `wheel_friction` | 1.0 | wheel sliding friction; the floor has zero friction so MuJoCo's max-combination uses the wheel value (scaled by `friction_scale`) |
+| `motor_kv`, `motor_torque_limit_nm` | 0.05, 0.3 | velocity-actuator gain and per-wheel torque limit (both scaled by `motor_strength_scale`) |
+| `obstacle_height_m`, `wall_height_m`, `obstacle_kinds` | 0.5, 0.5, [box, cylinder] | |
+| `start_goal_clearance_m` | 0.1 | start and goal at least `robot_radius_m + 0.1` m from obstacles and walls |
 | `control_dt_s` | 0.05 | 20 Hz policy rate |
+| `physics_dt_s` | 0.01 | 5 MuJoCo substeps per control step (implicitfast) |
+| `eval_seed` | 20261017 | layouts and noise for every evaluation; never a training seed |
 | `episode_limit` | 400 steps | 20 s |
 | `min_start_goal_distance_m` | 2.0 | |
 | `arrival_tolerance_m` | 0.25 | |

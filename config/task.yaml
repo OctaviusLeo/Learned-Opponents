@@ -1,33 +1,48 @@
-# Task / environment configuration (Configured_Values).
-# These values define the navigation task and the Obs_Action_Spec inputs.
-# Keep consistent with config/domain_rand.yaml (nominal values must match
-# where they overlap).
+# Navigation task configuration (Configured_Values), read by the MuJoCo Warp
+# environment, the evaluation, the parity fixtures, and the Unreal game.
+# Frozen after the pilot (task 8.3). Units are SI unless the name says otherwise.
 
-# --- Sensing ---
-n_rays: 16                 # N_rays: number of rangefinder rays in the Observation
-max_range_m: 5.0           # ray max range in meters; rays normalized to [0,1] by this
+# --- Arena and layouts ---
+arena_size_m: 8.0              # square interior [-4, 4] x [-4, 4]; diagonal 11.31 m
+wall_height_m: 0.5
+n_obstacles: [4, 8]            # uniform integer per episode, inclusive
+obstacle_size_m: [0.3, 1.0]    # box side or cylinder diameter, uniform
+obstacle_height_m: 0.5
+obstacle_kinds: [box, cylinder]  # chosen uniformly per obstacle; boxes are axis-aligned
+start_goal_clearance_m: 0.1    # start/goal at least robot_radius_m + this from obstacles and walls
+min_start_goal_distance_m: 2.0
 
-# --- Robot / actuation ---
-max_wheel_speed: 10.0      # rad/s; wheel-velocity actions in [-1,1] map to +/- this
+# --- Robot (differential drive) ---
+robot_radius_m: 0.15           # collision footprint (chassis cylinder radius)
+wheel_radius_m: 0.05
+track_width_m: 0.30
+max_wheel_speed: 20.0          # rad/s; v_max = 1.0 m/s, omega_max = 6.667 rad/s
+chassis_mass_kg: 2.0
+wheel_mass_kg: 0.1
+wheel_friction: 1.0            # nominal sliding friction of the wheel-floor contact
+motor_kv: 0.05                 # velocity-actuator gain, N*m*s/rad
+motor_torque_limit_nm: 0.3     # per-wheel torque limit (scaled by motor strength)
 
-# --- Arena ---
-# arena_diagonal_m is derived from arena size: sqrt(width^2 + height^2).
-arena:
-  width_m: 10.0
-  height_m: 10.0           # diagonal = sqrt(10^2 + 10^2) = 14.142135... m
+# --- Range rays ---
+n_rays: 24
+ray_fov_deg: 360.0
+ray_height_m: 0.15             # above the 0.10 m wheel tops, so rays never graze the wheels
+max_range_m: 4.0
 
-# --- Episode / success ---
-arrival_tolerance_m: 0.3   # success when within this distance of the goal
-episode_limit: 1000        # max steps before timeout termination
+# --- Timing ---
+control_dt_s: 0.05             # 20 Hz policy rate in both engines
+physics_dt_s: 0.01             # MuJoCo timestep; 5 substeps per control step
+episode_limit: 400             # control steps (20 s)
 
-# --- Reward weights (weighted sum of terms) ---
+# --- Termination and reward ---
+arrival_tolerance_m: 0.25
 reward:
-  w_progress: 1.0          # reward for progress toward the goal
-  w_success: 100.0         # bonus on reaching the goal
-  w_collision: -50.0       # penalty on collision
-  w_control: -0.01         # optional: penalize large wheel commands
-  w_time: -0.001           # optional: per-step time penalty
+  w_progress: 1.0              # per metre of distance-to-goal reduction
+  w_success: 10.0
+  w_collision: 10.0            # subtracted on collision
+  w_time: 0.0                  # optional per-step penalty (subtracted)
 
 # --- Evaluation ---
-nominal_success_target: 0.8   # target success rate at nominal params, in [0,1]
-eval_episodes: 200            # episodes per nominal evaluation
+nominal_success_target: 0.80   # Requirement 5.1
+eval_episodes_per_seed: 1024
+eval_seed: 20261017            # layouts and noise for every evaluation (never a training seed)

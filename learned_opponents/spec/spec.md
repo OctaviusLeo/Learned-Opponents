@@ -1,87 +1,93 @@
-# Obs_Action_Spec (engine-independent)
+# Obs_Action_Spec
 
-This document is the human-readable contract for the observation and action
-layout. It matches `obs_action_spec.py` **field-for-field**. The game's C++
-observation builder mirrors this document so that the vector built in-engine is
-identical to the one built in Python.
+The engine-independent contract between training (MuJoCo Warp) and the game
+(Unreal Engine 5.8). The executable reference is
+`learned_opponents/spec/obs_action_spec.py`; the game's C++ builder
+(`game/LearnedOpponents/Source/LearnedOpponents/Obs/`) reimplements these
+rules and is checked against Python-generated cases
+(`results/fixtures/obs_cases.json`, tolerance 1e-5). All values come from
+`config/task.yaml`; the defaults are shown in brackets.
 
-The **only** engine-specific input is `raycasts`. Every other field is computed
-from geometry (goal pose, robot pose, robot velocity), so the Python side and
-the game side compute them the same way.
+The task is goal navigation with obstacle avoidance by a differential-drive
+robot. There are no legged-locomotion fields (no joint angles, foot contacts,
+gait phase, or body orientation beyond what the goal direction carries).
 
-## Configured_Values
+## Frames
 
-| Name | Symbol | Meaning |
-|---|---|---|
-| `n_rays` | `N_rays` | number of rangefinder rays |
-| `max_range_m` | — | ray max range (m); rays normalized by this |
-| `max_wheel_speed` | — | max wheel velocity (rad/s); velocities normalized by this |
-| `arena_diagonal_m` | — | arena diagonal (m); goal distance normalized by this |
+- **Spec frame (world and robot):** right-handed, x forward, y left, z up,
+  metres, radians. Angles and yaw rates are positive counter-clockwise seen
+  from above. This is MuJoCo's convention.
+- **Robot frame:** origin at the robot centre, x along the robot's heading.
 
-`arena_diagonal_m` is derived from arena size when not given directly:
-`arena_diagonal_m = sqrt(width_m^2 + height_m^2)`.
+## Observation, dimension `n_rays + 5` [29], float32
 
-## Observation vector
+| Index | Field | Construction | Range |
+| --- | --- | --- | --- |
+| `0 .. n_rays-1` | `ray_i` | range along ray `i`, misses mapped (below), divided by `max_range_m` [4.0] | [0, 1] |
+| `n_rays + 0` | `goal_dir_x` | x of the unit vector from robot to goal, robot frame | [-1, 1] |
+| `n_rays + 1` | `goal_dir_y` | y of the same unit vector | [-1, 1] |
+| `n_rays + 2` | `goal_distance` | robot-to-goal distance / arena diagonal (`sqrt(2) * arena_size_m` [11.314 m]), clipped to 1 | [0, 1] |
+| `n_rays + 3` | `vel_linear` | robot-frame forward speed / `v_max`, clipped | [-1, 1] |
+| `n_rays + 4` | `vel_angular` | yaw rate / `omega_max`, clipped | [-1, 1] |
 
-Dimension: **`N_rays + 5`**. dtype: `float32`.
+### Rays
 
-Fixed ordering:
+- `n_rays` [24] horizontal rays start at the robot centre at height
+  `ray_height_m` [0.15 m] (above the 0.10 m wheel tops).
+- Angle of ray `i` in the robot frame:
+  - `ray_fov_deg` = 360: `theta_i = -180 deg + i * 360 / n_rays`. Index 0 points
+    straight back, indices increase counter-clockwise, index `n_rays / 4`
+    points right (-90 deg), `n_rays / 2` ahead (0 deg), `3 n_rays / 4` left (+90 deg).
+  - narrower fans: `theta_i = -fov/2 + i * fov / (n_rays - 1)`; index 0 is the
+    rightmost edge.
+- With the defaults the angles are -180, -165, ..., +165 degrees (15 degree steps).
+- **Miss and self-hit mapping:** a reading that is negative (MuJoCo returns
+  -1 for no hit), above `max_range_m`, not finite, or a hit on the robot's own
+  geometry becomes `max_range_m` before dividing. Both engines exclude the
+  robot from its own rays (MuJoCo: the rangefinder skips the site's body and
+  the rays are above the wheels; Unreal: the trace ignores the robot actor).
+- Sensor noise (randomized training only) is added to hit distances in metres
+  before this mapping.
 
-```
-[ ray_0, ray_1, ..., ray_{N_rays-1}, goal_dir_x, goal_dir_y, goal_distance, vel_linear, vel_angular ]
-```
+### Goal features
 
-| Slice | Field | Count | Units (raw) | Range (normalized) | Construction rule |
-|---|---|---|---|---|---|
-| `[0 : N_rays]` | ray distances | `N_rays` | meters | `[0, 1]` | `clip(ray / max_range_m, 0, 1)` per ray |
-| `[N_rays + 0]` | `goal_dir_x` | 1 | unit vector | `[-1, 1]` | x of unit vector to goal, in robot local frame |
-| `[N_rays + 1]` | `goal_dir_y` | 1 | unit vector | `[-1, 1]` | y of unit vector to goal, in robot local frame |
-| `[N_rays + 2]` | `goal_distance` | 1 | meters | `[0, 1]` | `clip(distance_m / arena_diagonal_m, 0, 1)` |
-| `[N_rays + 3]` | `vel_linear` | 1 | m/s | `[-1, 1]` | `clip(linear / max_wheel_speed, -1, 1)` |
-| `[N_rays + 4]` | `vel_angular` | 1 | rad/s | `[-1, 1]` | `clip(angular / max_wheel_speed, -1, 1)` |
+`d = goal_xy - robot_xy` in the world frame is rotated into the robot frame
+by `-yaw`: `lx = cos(yaw) dx + sin(yaw) dy`, `ly = -sin(yaw) dx + cos(yaw) dy`.
+`goal_dir = (lx, ly) / |(lx, ly)|`, or `(0, 0)` when the distance is below
+1e-9 m.
 
-### Goal direction / distance (robot local frame)
+### Velocity normalizers
 
-Given goal position `(goal_x, goal_y)`, robot position `(robot_x, robot_y)`,
-and robot heading `robot_theta` (radians), all in the world frame:
+- `v_max = wheel_radius_m * max_wheel_speed` [0.05 * 20 = 1.0 m/s]
+- `omega_max = 2 * wheel_radius_m * max_wheel_speed / track_width_m` [6.667 rad/s]
 
-```
-dx = goal_x - robot_x
-dy = goal_y - robot_y
+## Action, dimension 2, float32
 
-# rotate world delta into the robot frame (rotate by -theta)
-local_x =  cos(theta) * dx + sin(theta) * dy
-local_y = -sin(theta) * dx + cos(theta) * dy
+| Index | Field | Meaning | Range |
+| --- | --- | --- | --- |
+| 0 | `wheel_left` | left wheel angular velocity / `max_wheel_speed` [20 rad/s] | [-1, 1] |
+| 1 | `wheel_right` | right wheel angular velocity / `max_wheel_speed` | [-1, 1] |
 
-distance_m = hypot(local_x, local_y)
-goal_dir_x = local_x / distance_m      # 0 if distance_m ~ 0
-goal_dir_y = local_y / distance_m      # 0 if distance_m ~ 0
-```
+Actions are clipped to [-1, 1] before use. Positive wheel speed drives the
+robot forward. Ideal differential-drive kinematics (the game's kinematic
+robot): `v = r (w_l + w_r) / 2`, `omega = r (w_r - w_l) / track_width_m`.
 
-`goal_dir_*` are unit-vector components (already in `[-1, 1]`). When the robot
-is at the goal (`distance_m ~ 0`), the direction is undefined and both
-components are set to `0`.
+## Timing
 
-## Action vector
+The policy runs once per control step of `control_dt_s` [0.05 s, 20 Hz] in
+both engines; the action is held for the whole step. The observation is built
+from the state at the end of the previous control step.
 
-Dimension: **2**. dtype: `float32`. Differential drive.
+## Unreal conversion (left-handed, x forward, y right, z up, centimetres)
 
-```
-[ wheel_left, wheel_right ]
-```
+| Quantity | Unreal | Spec |
+| --- | --- | --- |
+| position | `(x_cm, y_cm)` | `(x_cm / 100, -y_cm / 100)` |
+| yaw | `yaw_deg`, clockwise seen from above | `-radians(yaw_deg)` |
+| yaw rate | `deg/s`, clockwise | `-radians(rate)` |
+| forward speed | `cm/s` along the actor's forward vector | `/ 100` |
+| ray `i` direction | actor yaw + `(-degrees(theta_i))` | angle `theta_i` |
+| distances | cm | `/ 100` |
 
-| Index | Field | Range | Meaning |
-|---|---|---|---|
-| `0` | `wheel_left` | `[-1, 1]` | normalized left-wheel velocity |
-| `1` | `wheel_right` | `[-1, 1]` | normalized right-wheel velocity |
-
-Each component is a normalized wheel velocity, mapped to rad/s by
-`max_wheel_speed` downstream. `build_action` clamps both components to `[-1, 1]`.
-
-## Excluded fields (Requirement 2.5)
-
-This is a wheeled differential-drive robot. The spec **excludes all
-legged-locomotion fields**: no joint angles, no joint velocities, no foot/toe
-contact flags, no gait phase or clock signal, and no full body-orientation
-quaternion. Heading information is carried solely by `goal_dir_x`/`goal_dir_y`
-in the robot frame.
+The game converts each quantity first and then applies exactly the rules
+above, so the only intended difference between engines is the raycast source.
