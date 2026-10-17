@@ -90,7 +90,7 @@ flowchart TD
   - Demo/verify: the `design.md` M0 section shows a concrete chosen framework with evidence paths that exist on disk.
   - _Requirements: 1.4, 0.1_
 
-- [ ] 3g. **Automated gate (M0):** run `scripts/verify_m0.sh`, which checks the layout, `.gitignore` and `.gitattributes` coverage, `git remote`, that `results/smoke_result.json` names a passing framework, and that `~/.venvs/learned-opponents/bin/python -c "import learned_opponents"` succeeds; proceed when it exits 0. No manual review stop.
+- [x] 3g. **Automated gate (M0):** run `scripts/verify_m0.sh`, which checks the layout, `.gitignore` and `.gitattributes` coverage, `git remote`, that `results/smoke_result.json` names a passing framework, and that `~/.venvs/learned-opponents/bin/python -c "import learned_opponents"` succeeds; proceed when it exits 0. No manual review stop.
 
 ### M1 — Obs/Action spec, navigation environment, randomization
 
