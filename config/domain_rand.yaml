@@ -1,46 +1,24 @@
-# Domain-randomization configuration (Configured_Values).
-# Each parameter has a [min, max] sampling range AND an explicit `nominal`
-# value. The RANDOMIZED variant samples uniformly from [min, max]; the
-# BASELINE variant uses `nominal` for every parameter (no sampling).
-#
-# `nominal` is the value used with randomization OFF. It must lie inside the
-# [min, max] range and, where it overlaps config/task.yaml, must match that
-# file's nominal (e.g. the robot mass used by the task).
-#
-# Units:
-#   mass                      - kg (robot body mass)
-#   wheel_friction            - dimensionless friction coefficient
-#   motor_strength            - multiplier on nominal motor torque (1.0 = nominal)
-#   sensor_noise_sigma        - stddev of additive ray noise, in meters
-#   action_latency_steps      - integer steps of delay applied to actions
-#   observation_latency_steps - integer steps of delay applied to observations
+# Domain randomization (Configured_Values), sampled at every episode reset for
+# the randomized variant; the baseline variant holds every parameter at its
+# nominal value. mass, friction, and motor strength are scale factors on the
+# nominal values in task.yaml (chassis/wheel mass, wheel friction, motor kv and
+# torque limit). Latencies are whole control steps. Frozen after task 8.3.
 
-mass:
-  nominal: 2.0
-  min: 1.5
-  max: 2.5
-
-wheel_friction:
+mass_scale:
   nominal: 1.0
-  min: 0.7
-  max: 1.3
-
-motor_strength:
+  range: [0.8, 1.2]
+friction_scale:
   nominal: 1.0
-  min: 0.8
-  max: 1.2
-
-sensor_noise_sigma:
+  range: [0.6, 1.2]
+motor_strength_scale:
+  nominal: 1.0
+  range: [0.8, 1.2]
+sensor_noise_sigma_m:        # additive Gaussian noise on ray hit distances, drawn every step
   nominal: 0.0
-  min: 0.0
-  max: 0.05
-
-action_latency_steps:
+  range: [0.0, 0.05]
+action_latency_steps:        # delay queue on the applied action
   nominal: 0
-  min: 0
-  max: 2
-
-observation_latency_steps:
+  range: [0, 2]
+observation_latency_steps:   # delay queue on the returned observation
   nominal: 0
-  min: 0
-  max: 2
+  range: [0, 2]

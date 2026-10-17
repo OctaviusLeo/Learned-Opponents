@@ -1,154 +1,113 @@
-"""Domain-randomization sampler.
+"""Domain-randomization sampler (task 7.1).
 
-Samples physics/sensing parameters at episode reset from the configured ranges
-in ``config/domain_rand.yaml``:
+At every episode reset the randomized variant draws, per environment, the
+robot mass scale, wheel friction scale, motor strength scale, ray-noise sigma,
+action latency, and observation latency from the ranges in
+``config/domain_rand.yaml``. The baseline variant returns the nominal values
+and consumes no randomness.
 
-    - mass
-    - wheel_friction
-    - motor_strength
-    - sensor_noise (sigma)
-    - action_latency (steps)
-    - observation_latency (steps)
+All draws come from an explicit ``numpy.random.Generator`` derived from the
+run seed (``make_rng``), in a fixed parameter order, so a given
+``(seed, config, variant)`` reproduces the draws exactly. Imports only numpy
+and the standard library.
 
-Two variants:
-
-    - RANDOMIZED: each parameter is drawn uniformly from its ``[min, max]``
-      range (latency parameters are drawn as integers).
-    - BASELINE: every parameter is left at its configured ``nominal`` value;
-      no sampling is performed.
-
-Reproducibility (Requirements 0.2, 0.3, 4.2): ALL draws derive from the run
-seed via an explicit ``numpy.random.Generator``. The same ``(seed, config,
-variant)`` reproduces the same draws exactly. The global numpy RNG state is
-never touched.
-
-Run as a script for a demo::
-
-    python -m learned_opponents.randomization.domain_rand
+Demo: ``python -m learned_opponents.randomization.domain_rand``
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
-from typing import Mapping
+import zlib
+from dataclasses import dataclass
+from typing import Any, Mapping
 
 import numpy as np
 
-# Parameters sampled as integers (latency in steps); the rest are continuous.
-_INTEGER_PARAMS = frozenset({"action_latency_steps", "observation_latency_steps"})
-
-# Canonical parameter order used by this sampler. Draws are consumed from the
-# Generator in THIS order so a given (seed, config) is fully reproducible.
-PARAM_ORDER = (
-    "mass",
-    "wheel_friction",
-    "motor_strength",
-    "sensor_noise_sigma",
-    "action_latency_steps",
-    "observation_latency_steps",
-)
-
-BASELINE = "baseline"
-RANDOMIZED = "randomized"
+PARAMS = ("mass_scale", "friction_scale", "motor_strength_scale", "sensor_noise_sigma_m",
+          "action_latency_steps", "observation_latency_steps")
+INTEGER_PARAMS = frozenset({"action_latency_steps", "observation_latency_steps"})
+VARIANTS = ("baseline", "randomized")
 
 
 @dataclass(frozen=True)
-class SampledParams:
-    """One episode's sampled (or nominal) physics/sensing parameters."""
+class ParamRange:
+    nominal: float
+    low: float
+    high: float
+    integer: bool = False
 
-    mass: float
-    wheel_friction: float
-    motor_strength: float
-    sensor_noise_sigma: float
-    action_latency_steps: int
-    observation_latency_steps: int
-
-    def as_dict(self) -> dict:
-        return asdict(self)
+    def contains(self, x) -> np.ndarray:
+        return (np.asarray(x) >= self.low) & (np.asarray(x) <= self.high)
 
 
-def _nominal_params(config: Mapping) -> SampledParams:
-    """Build the baseline (nominal) parameter set from the config."""
-    values = {}
-    for name in PARAM_ORDER:
-        nominal = config[name]["nominal"]
-        values[name] = int(nominal) if name in _INTEGER_PARAMS else float(nominal)
-    return SampledParams(**values)
+def parse_ranges(cfg: Mapping[str, Any]) -> dict[str, ParamRange]:
+    """Validate a parsed domain_rand.yaml; errors name the offending parameter."""
+    out = {}
+    for name in PARAMS:
+        if name not in cfg:
+            raise ValueError(f"domain_rand: missing parameter '{name}'")
+        entry = cfg[name]
+        try:
+            nominal = entry["nominal"]
+            low, high = entry["range"]
+        except (KeyError, TypeError, ValueError):
+            raise ValueError(f"domain_rand: '{name}' needs 'nominal' and 'range: [min, max]'") from None
+        integer = name in INTEGER_PARAMS
+        if integer and not all(float(v).is_integer() for v in (nominal, low, high)):
+            raise ValueError(f"domain_rand: '{name}' must use whole numbers of steps")
+        nominal, low, high = float(nominal), float(low), float(high)
+        if not low <= nominal <= high:
+            raise ValueError(f"domain_rand: '{name}' needs min <= nominal <= max, got "
+                             f"{low} <= {nominal} <= {high}")
+        if low < 0:
+            raise ValueError(f"domain_rand: '{name}' must be >= 0, got min {low}")
+        if name.endswith("_scale") and low <= 0:
+            raise ValueError(f"domain_rand: '{name}' must be > 0")
+        out[name] = ParamRange(nominal, low, high, integer)
+    extra = set(cfg) - set(PARAMS)
+    if extra:
+        raise ValueError(f"domain_rand: unknown parameters {sorted(extra)}")
+    return out
 
 
-def _draw(rng: np.random.Generator, name: str, spec: Mapping):
-    """Draw one parameter from its [min, max] range using ``rng``."""
-    lo = spec["min"]
-    hi = spec["max"]
-    if name in _INTEGER_PARAMS:
-        # integers() upper bound is exclusive -> +1 to include hi.
-        return int(rng.integers(int(lo), int(hi) + 1))
-    return float(rng.uniform(float(lo), float(hi)))
+def make_rng(seed: int, stream: str) -> np.random.Generator:
+    """Independent, reproducible generator for one named use of a run seed."""
+    return np.random.default_rng(np.random.SeedSequence([int(seed), zlib.crc32(stream.encode())]))
 
 
-def sample(config: Mapping, seed: int, variant: str) -> SampledParams:
-    """Sample the domain-randomization parameters for one episode.
+def nominal_params(n: int, ranges: Mapping[str, ParamRange]) -> dict[str, np.ndarray]:
+    return {k: np.full(n, r.nominal, dtype=np.int64 if r.integer else np.float64)
+            for k, r in ranges.items()}
 
-    Args:
-        config: parsed ``domain_rand.yaml`` mapping. Each parameter maps to a
-            dict with ``nominal``, ``min``, and ``max``.
-        seed: the run seed. All draws derive from this via a dedicated
-            ``numpy.random.Generator``; the global RNG is not touched.
-        variant: ``"baseline"`` (all nominal) or ``"randomized"`` (sample).
 
-    Returns:
-        A :class:`SampledParams` instance.
-
-    Raises:
-        ValueError: if ``variant`` is not recognized.
-    """
-    if variant == BASELINE:
-        return _nominal_params(config)
-
-    if variant != RANDOMIZED:
-        raise ValueError(
-            f"variant must be '{BASELINE}' or '{RANDOMIZED}', got {variant!r}"
-        )
-
-    rng = np.random.default_rng(seed)
-    values = {}
-    for name in PARAM_ORDER:
-        values[name] = _draw(rng, name, config[name])
-    return SampledParams(**values)
+def sample_params(rng: np.random.Generator, n: int, ranges: Mapping[str, ParamRange],
+                  variant: str) -> dict[str, np.ndarray]:
+    """Draw ``n`` episodes of parameters. Baseline returns nominal values."""
+    if variant not in VARIANTS:
+        raise ValueError(f"variant must be one of {VARIANTS}, got {variant!r}")
+    if variant == "baseline":
+        return nominal_params(n, ranges)
+    out = {}
+    for name in PARAMS:          # fixed order keeps the stream reproducible
+        r = ranges[name]
+        if r.integer:
+            out[name] = rng.integers(int(r.low), int(r.high) + 1, size=n, dtype=np.int64)
+        else:
+            out[name] = rng.uniform(r.low, r.high, size=n)
+    return out
 
 
 def _demo() -> None:
-    """Task 7.1 demo: reproducibility, in-range draws, baseline == nominal."""
-    # Self-contained config mirroring config/domain_rand.yaml so the demo runs
-    # without reading files.
-    config = {
-        "mass": {"nominal": 2.0, "min": 1.5, "max": 2.5},
-        "wheel_friction": {"nominal": 1.0, "min": 0.7, "max": 1.3},
-        "motor_strength": {"nominal": 1.0, "min": 0.8, "max": 1.2},
-        "sensor_noise_sigma": {"nominal": 0.0, "min": 0.0, "max": 0.05},
-        "action_latency_steps": {"nominal": 0, "min": 0, "max": 2},
-        "observation_latency_steps": {"nominal": 0, "min": 0, "max": 2},
-    }
-    seed = 42
+    from learned_opponents.config import load_yaml
 
-    a = sample(config, seed, RANDOMIZED)
-    b = sample(config, seed, RANDOMIZED)
-    print("randomized draw a:", a.as_dict())
-    print("randomized draw b:", b.as_dict())
-    print("identical for fixed seed:", a == b)
-
-    in_range = all(
-        config[name]["min"] <= getattr(a, name) <= config[name]["max"]
-        for name in PARAM_ORDER
-    )
-    print("all draws in configured range:", in_range)
-
-    base = sample(config, seed, BASELINE)
-    nominal_match = all(
-        getattr(base, name) == config[name]["nominal"] for name in PARAM_ORDER
-    )
-    print("baseline draw:", base.as_dict())
-    print("baseline == nominal:", nominal_match)
+    ranges = parse_ranges(load_yaml("domain_rand.yaml"))
+    a = sample_params(make_rng(0, "domain_rand"), 5, ranges, "randomized")
+    b = sample_params(make_rng(0, "domain_rand"), 5, ranges, "randomized")
+    base = sample_params(make_rng(0, "domain_rand"), 5, ranges, "baseline")
+    print("same seed -> identical draws:", all(np.array_equal(a[k], b[k]) for k in PARAMS))
+    print("all draws inside their ranges:", all(ranges[k].contains(a[k]).all() for k in PARAMS))
+    print("baseline equals nominal:", all(np.all(base[k] == ranges[k].nominal) for k in PARAMS))
+    for k in PARAMS:
+        print(f"  {k:26s} {np.round(a[k], 3).tolist()}")
 
 
 if __name__ == "__main__":
