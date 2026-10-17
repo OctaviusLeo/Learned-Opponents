@@ -2,9 +2,11 @@
 .env
 *.env
 .env.*
+*.local
 *.key
 *.pem
 secrets.yaml
+credentials.json
 *.token
 *token*.txt
 
