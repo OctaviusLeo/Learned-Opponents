@@ -1,0 +1,19 @@
+Parity evidence (task 14.1), 2026-10-18T03:09Z, commit ae3f9c7e40dfe14d636527c851832f6190f68da5, commands: python -m learned_opponents.export.parity ; python -m learned_opponents.export.parity --mismatch-demo
+== parity
+PASS baseline_seed0 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 2.503e-06 at observation 635 (tolerance 1e-04)
+PASS baseline_seed0 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 2.503e-06 at observation 635 (tolerance 1e-04)
+PASS baseline_seed1 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 2.384e-06 at observation 779 (tolerance 1e-04)
+PASS baseline_seed1 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 2.384e-06 at observation 779 (tolerance 1e-04)
+PASS baseline_seed2 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 3.994e-06 at observation 684 (tolerance 1e-04)
+PASS baseline_seed2 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 3.994e-06 at observation 684 (tolerance 1e-04)
+PASS randomized_seed0 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 2.146e-06 at observation 916 (tolerance 1e-04)
+PASS randomized_seed0 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 2.146e-06 at observation 916 (tolerance 1e-04)
+PASS randomized_seed1 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 1.192e-06 at observation 955 (tolerance 1e-04)
+PASS randomized_seed1 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 1.192e-06 at observation 955 (tolerance 1e-04)
+PASS randomized_seed2 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 2.027e-06 at observation 738 (tolerance 1e-04)
+PASS randomized_seed2 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 2.027e-06 at observation 738 (tolerance 1e-04)
+parity: PASS (6 models, tolerance 1e-04)
+== parity exit 0
+== mismatch demo
+FAIL baseline_seed0 with one perturbed weight (expected to FAIL): 1000 observations, max |action diff| 1.955e-02 at observation 663 (tolerance 1e-04)
+== demo exit 0 (0 means the perturbed model failed parity as expected)

@@ -188,10 +188,10 @@ flowchart TD
     - Confirm each exported model's input/output names and shapes match the Obs_Action_Spec (single execution; runs in CI).
     - _Requirements: 7.6_
 
-- [ ] 14. Implement the parity test
-  - [ ] 14.1 Implement `export/parity.py` feeding the saved Observations through the Python Policy (the framework's own deterministic inference) and the ONNX_Model (ONNX Runtime, CPU) and comparing Actions against the stated tolerance (max absolute difference ≤ 1e-4); pass only when every Action is within tolerance; on failure report the Observation index and the largest disagreement (_Requirements: 7.3, 7.4, 7.5_).
+- [x] 14. Implement the parity test
+  - [x] 14.1 Implement `export/parity.py` feeding the saved Observations through the Python Policy (the framework's own deterministic inference) and the ONNX_Model (ONNX Runtime, CPU) and comparing Actions against the stated tolerance (max absolute difference ≤ 1e-4); pass only when every Action is within tolerance; on failure report the Observation index and the largest disagreement (_Requirements: 7.3, 7.4, 7.5_).
     - Demo/verify: `python -m learned_opponents.export.parity` passes on all six exported models and, when fed a deliberately mismatched model, fails and names the worst observation.
-  - [ ] 14.2 Write Hypothesis property tests for parity
+  - [x] 14.2 Write Hypothesis property tests for parity
     - **Property 12: ONNX parity holds within tolerance** (≥100 iterations over saved/generated observations).
     - **Property 13: Parity failure reports the worst disagreement** (≥100 iterations).
     - _Properties: 12, 13 — Requirements: 7.3, 7.4, 7.5_
