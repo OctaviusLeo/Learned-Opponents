@@ -1,0 +1,150 @@
+{
+ "note": "pilot 2 (entropy_coef 0.0) stopped at 125M steps because action std diverged again; deterministic nominal evaluation of its checkpoints on the pilot layouts",
+ "command": "scratch evaluation via learned_opponents.train.pilot._evaluate",
+ "points": [
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00102.pt",
+   "iteration": 102,
+   "success": 3957,
+   "collision": 108,
+   "timeout": 31,
+   "n": 4096,
+   "success_rate": 0.966064453125,
+   "env_steps": 10027008,
+   "elapsed_min": 1.0698333333333332,
+   "action_std": 0.3280787467956543
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00204.pt",
+   "iteration": 204,
+   "success": 3950,
+   "collision": 139,
+   "timeout": 7,
+   "n": 4096,
+   "success_rate": 0.96435546875,
+   "env_steps": 20054016,
+   "elapsed_min": 2.0738333333333334,
+   "action_std": 0.3263211250305176
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00306.pt",
+   "iteration": 306,
+   "success": 3960,
+   "collision": 129,
+   "timeout": 7,
+   "n": 4096,
+   "success_rate": 0.966796875,
+   "env_steps": 30081024,
+   "elapsed_min": 3.0861666666666663,
+   "action_std": 0.4041057527065277
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00407.pt",
+   "iteration": 407,
+   "success": 3990,
+   "collision": 104,
+   "timeout": 2,
+   "n": 4096,
+   "success_rate": 0.97412109375,
+   "env_steps": 40009728,
+   "elapsed_min": 4.060333333333333,
+   "action_std": 0.482322633266449
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00509.pt",
+   "iteration": 509,
+   "success": 3988,
+   "collision": 103,
+   "timeout": 5,
+   "n": 4096,
+   "success_rate": 0.9736328125,
+   "env_steps": 50036736,
+   "elapsed_min": 5.069999999999999,
+   "action_std": 0.573149561882019
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00611.pt",
+   "iteration": 611,
+   "success": 3959,
+   "collision": 133,
+   "timeout": 4,
+   "n": 4096,
+   "success_rate": 0.966552734375,
+   "env_steps": 60063744,
+   "elapsed_min": 6.093833333333333,
+   "action_std": 0.7218602895736694
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00713.pt",
+   "iteration": 713,
+   "success": 3938,
+   "collision": 151,
+   "timeout": 7,
+   "n": 4096,
+   "success_rate": 0.96142578125,
+   "env_steps": 70090752,
+   "elapsed_min": 7.132333333333333,
+   "action_std": 0.8540551066398621
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00814.pt",
+   "iteration": 814,
+   "success": 3955,
+   "collision": 138,
+   "timeout": 3,
+   "n": 4096,
+   "success_rate": 0.965576171875,
+   "env_steps": 80019456,
+   "elapsed_min": 8.1615,
+   "action_std": 0.9263690710067749
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00916.pt",
+   "iteration": 916,
+   "success": 3917,
+   "collision": 173,
+   "timeout": 6,
+   "n": 4096,
+   "success_rate": 0.956298828125,
+   "env_steps": 90046464,
+   "elapsed_min": 9.225333333333333,
+   "action_std": 1.0897654294967651
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter01018.pt",
+   "iteration": 1018,
+   "success": 3954,
+   "collision": 141,
+   "timeout": 1,
+   "n": 4096,
+   "success_rate": 0.96533203125,
+   "env_steps": 100073472,
+   "elapsed_min": 10.246,
+   "action_std": 1.2516146898269653
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter01119.pt",
+   "iteration": 1119,
+   "success": 3930,
+   "collision": 164,
+   "timeout": 2,
+   "n": 4096,
+   "success_rate": 0.95947265625,
+   "env_steps": 110002176,
+   "elapsed_min": 11.276,
+   "action_std": 1.448390007019043
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter01221.pt",
+   "iteration": 1221,
+   "success": 3910,
+   "collision": 186,
+   "timeout": 0,
+   "n": 4096,
+   "success_rate": 0.95458984375,
+   "env_steps": 120029184,
+   "elapsed_min": 12.343666666666667,
+   "action_std": 1.8937866687774658
+  }
+ ]
+}

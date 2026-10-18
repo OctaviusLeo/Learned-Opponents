@@ -5,8 +5,9 @@
 
 The graph is the whole deterministic policy, so the game feeds it the raw
 Obs_Action_Spec vector and uses its output directly: the learned observation
-normalization ``(obs - mean) / (std + eps)``, the MLP, and the clip to
-[-1, 1] the environment applies. I/O: input ``obs`` float32[1, n_rays + 5],
+normalization ``(obs - mean) / (std + eps)``, the MLP, the distribution's
+deterministic head (the Gaussian mean, or the Beta mean computed from the
+Softplus-transformed parameters), and the clip to [-1, 1] the environment applies. I/O: input ``obs`` float32[1, n_rays + 5],
 output ``action`` float32[1, 2], opset 17 (IR version 8).
 
 Parity fixtures per model (``results/parity/<variant>_seed<seed>/``): 1,000
@@ -52,9 +53,10 @@ def export(run_dir: Path, out: Path, commit: str) -> dict:
             super().__init__()
             self.normalizer = actor.obs_normalizer
             self.mlp = actor.mlp
+            self.head = actor.distribution.as_deterministic_output_module()   # Gaussian mean or Beta mean
 
         def forward(self, obs):
-            return torch.clamp(self.mlp(self.normalizer(obs)), -1.0, 1.0)
+            return torch.clamp(self.head(self.mlp(self.normalizer(obs))), -1.0, 1.0)
 
     module = DeterministicPolicy().eval()
     out.parent.mkdir(parents=True, exist_ok=True)

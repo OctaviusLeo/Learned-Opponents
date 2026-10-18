@@ -1,9 +1,10 @@
 """Build and load the rsl-rl actor; the deterministic action used everywhere.
 
-The deterministic action is the Gaussian mean of the rsl-rl ``MLPModel``
-(learned observation normalization inside the model), clipped to [-1, 1] as
-the environment clips it. Evaluation, parity fixtures, and the ONNX export all
-go through ``deterministic_action`` so they agree with training.
+The deterministic action is the mean of the rsl-rl ``MLPModel``'s output
+distribution (learned observation normalization inside the model), clipped to
+[-1, 1] as the environment clips it: the Gaussian mean, or the Beta mean,
+which already lies in [-1, 1]. Evaluation, parity fixtures, and the ONNX export
+all use the same computation so they agree with training.
 """
 
 from __future__ import annotations
@@ -20,12 +21,21 @@ from tensordict import TensorDict
 OBS_GROUP = "policy"
 
 
+def distribution_cfg(train_cfg: Mapping[str, Any]) -> dict[str, Any]:
+    """Gaussian (mean clipped by the env) or Beta (support exactly [-1, 1], deterministic = its mean)."""
+    p = train_cfg["policy"]
+    kind = p.get("distribution", "gaussian")
+    if kind == "beta":
+        return {"class_name": "BetaDistribution", "action_range": [-1.0, 1.0]}
+    if kind == "gaussian":
+        return {"class_name": "GaussianDistribution", "init_std": float(p["init_std"]), "std_type": "scalar"}
+    raise ValueError(f"policy.distribution must be gaussian or beta, got {kind!r}")
+
+
 def actor_kwargs(train_cfg: Mapping[str, Any]) -> dict[str, Any]:
     p = train_cfg["policy"]
     return {"hidden_dims": list(p["hidden_sizes"]), "activation": p["activation"],
-            "obs_normalization": bool(p["obs_normalization"]),
-            "distribution_cfg": {"class_name": "GaussianDistribution", "init_std": float(p["init_std"]),
-                                 "std_type": "scalar"}}
+            "obs_normalization": bool(p["obs_normalization"]), "distribution_cfg": distribution_cfg(train_cfg)}
 
 
 def critic_kwargs(train_cfg: Mapping[str, Any]) -> dict[str, Any]:

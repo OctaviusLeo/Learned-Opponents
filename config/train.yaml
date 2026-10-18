@@ -17,7 +17,7 @@ ppo:
   schedule: adaptive               # KL-adaptive learning rate
   desired_kl: 0.01
   clip_param: 0.2
-  entropy_coef: 0.0                # pilot 1 with 0.005: action std diverged (1.0 -> 5.1 in 40M steps) under env-side clipping and deterministic success fell 0.951 -> 0.922 (docs/evidence/pilot/)
+  entropy_coef: 0.0                # pilots 1-2: see docs/evidence/pilot/README.md
   value_loss_coef: 1.0
   max_grad_norm: 1.0
   gamma: 0.99
@@ -27,7 +27,8 @@ ppo:
 policy:
   hidden_sizes: [256, 256]
   activation: elu
-  init_std: 1.0
+  distribution: beta               # pilots 1-2 (Gaussian): std drifted up under env-side clipping and deterministic success fell; Beta has support [-1, 1]
+  init_std: 1.0                    # Gaussian only
   obs_normalization: true          # EmpiricalNormalization inside the policy (exported with it)
 
 seeds:
