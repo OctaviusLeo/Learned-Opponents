@@ -13,12 +13,12 @@ function Step([string]$Name, [scriptblock]$Body) {
     $results[$Name] = $ok
     Write-Host ("{0}  {1}" -f ($(if ($ok) { "PASS" } else { "FAIL" })), $Name)
 }
-function Wsl([string]$Cmd) { wsl -d Ubuntu-24.04 -- bash -c "cd /mnt/c/dev/Projects/Learned-Opponents && $Cmd" }
+function Invoke-InWsl([string]$Cmd) { wsl.exe -d Ubuntu-24.04 -- bash -c "cd /mnt/c/dev/Projects/Learned-Opponents && $Cmd" }
 $Py = "~/.venvs/learned-opponents/bin/python"
 
-Step "full pytest (WSL)" { Wsl "$Py -m pytest -q -p no:cacheprovider tests" }
+Step "full pytest (WSL)" { Invoke-InWsl "$Py -m pytest -q -p no:cacheprovider tests" }
 Step "Unreal automation tests" { & "$PSScriptRoot\run_ue_tests.ps1" }
-Step "parity, six models" { Wsl "$Py -m learned_opponents.export.parity" }
+Step "parity, six models" { Invoke-InWsl "$Py -m learned_opponents.export.parity" }
 Step "summary sections" {
     $s = Get-Content (Join-Path $Repo "results\summary.md") -Raw -Encoding utf8
     $need = @("## Nominal evaluation: baseline", "## Robustness grid", "## Transfer check")
@@ -29,7 +29,7 @@ Step "gameplay GIF" {
     $g = Join-Path $Repo "docs\media\gameplay.gif"
     if ((Test-Path $g) -and ((Get-Item $g).Length -lt 10MB)) { $global:LASTEXITCODE = 0 } else { $global:LASTEXITCODE = 1 }
 }
-Step "README matches summary.md" { Wsl "$Py -m learned_opponents.eval.readme --check" }
+Step "README matches summary.md" { Invoke-InWsl "$Py -m learned_opponents.eval.readme --check" }
 Step "CI green on the latest pushed commit" {
     $head = (git -C $Repo rev-parse HEAD).Trim()
     $remote = (git -C $Repo rev-parse origin/master).Trim()
