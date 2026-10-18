@@ -1,6 +1,7 @@
 #include "Race/LORaceManager.h"
 
 #include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Dom/JsonObject.h"
 #include "Components/LightComponent.h"
@@ -96,12 +97,24 @@ void ALORaceManager::BeginPlay()
 		Markers.Add(M);
 	}
 
-	ADirectionalLight* Light = World->SpawnActor<ADirectionalLight>(FVector(0, 0, 1000), FRotator(-60.0, 35.0, 0.0));
-	if (Light)
+	// Key light with shadows plus a weak shadowless fill from the opposite side.
+	const FRotator LightDirs[2] = {FRotator(-60.0, 35.0, 0.0), FRotator(-45.0, 215.0, 0.0)};
+	for (int32 I = 0; I < 2; ++I)
 	{
-		Light->GetLightComponent()->SetMobility(EComponentMobility::Movable);
+		if (ADirectionalLight* Light = World->SpawnActor<ADirectionalLight>(FVector(0, 0, 1000), LightDirs[I]))
+		{
+			ULightComponent* LC = Light->GetLightComponent();
+			LC->SetMobility(EComponentMobility::Movable);
+			LC->SetIntensity(I == 0 ? 6.0f : 2.0f);
+			LC->SetCastShadows(I == 0);
+		}
 	}
-	ACameraActor* Camera = World->SpawnActor<ACameraActor>(FVector(0, 0, 1150), FRotator(-90.0, 0.0, 0.0));
+	// Top-down camera: 70 degrees horizontal FOV from 11 m shows the 8 m arena on a 16:9 screen.
+	ACameraActor* Camera = World->SpawnActor<ACameraActor>(FVector(0, 0, 1100), FRotator(-90.0, 0.0, 0.0));
+	if (Camera)
+	{
+		Camera->GetCameraComponent()->SetFieldOfView(70.f);
+	}
 	if (APlayerController* PC = World->GetFirstPlayerController(); PC && Camera)
 	{
 		PC->SetViewTarget(Camera);
