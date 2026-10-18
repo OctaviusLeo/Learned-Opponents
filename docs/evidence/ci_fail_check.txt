@@ -1,0 +1,12 @@
+Task 18.1 red-run check (2026-10-18T01:27Z)
+Branch ci-fail-check, commit f6acf2c (adds tests/test_ci_fail_check.py with 'assert 1 + 1 == 3' on top of origin/master)
+run 39086485229 https://github.com/OctaviusLeo/Learned-Opponents/actions/runs/39086485229
+branch ci-fail-check sha f6acf2cc0d9bb346d0970fc6d64782a392419c92 event push
+status completed conclusion failure
+FAILED tests/test_ci_fail_check.py::test_ci_reports_failure - assert (1 + 1) == 3
+============ 1 failed, 90 passed, 7 skipped, 1 deselected in 13.73s ============
+Branch deleted afterwards (git push origin --delete ci-fail-check; git branch -D ci-fail-check).
+
+Green run on master for comparison:
+run 39086451875 https://github.com/OctaviusLeo/Learned-Opponents/actions/runs/39086451875 sha aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f conclusion success
+================= 90 passed, 7 skipped, 1 deselected in 9.80s ==================

@@ -1,0 +1,35 @@
+{
+ "kind": "pilot_reproducibility",
+ "command": "python -m learned_opponents.train.pilot repro",
+ "commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+ "seed": 100,
+ "eval_seed": "pilot evaluation stream of seed 100",
+ "episodes": 4096,
+ "runs": {
+  "repro_a": {
+   "checkpoint": "runs/pilot/repro_a/checkpoint.pt",
+   "iteration": 306,
+   "success": 3993,
+   "collision": 31,
+   "timeout": 72,
+   "n": 4096,
+   "success_rate": 0.974853515625,
+   "wall_min": 4.88,
+   "train_commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "training_command": "python -m learned_opponents.train --variant baseline --seed 100 --out runs/pilot/repro_a --force"
+  },
+  "repro_b": {
+   "checkpoint": "runs/pilot/repro_b/checkpoint.pt",
+   "iteration": 306,
+   "success": 4011,
+   "collision": 35,
+   "timeout": 50,
+   "n": 4096,
+   "success_rate": 0.979248046875,
+   "wall_min": 4.1,
+   "train_commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "training_command": "python -m learned_opponents.train --variant baseline --seed 100 --out runs/pilot/repro_b --force"
+  }
+ },
+ "tolerance": 0.00439453125
+}

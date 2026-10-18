@@ -132,14 +132,14 @@ flowchart TD
 
 ### M2 — Baseline training
 
-- [ ] 8. Implement the PPO trainer and fix the training budget
+- [x] 8. Implement the PPO trainer and fix the training budget
   - [x] 8.1 Implement `train/train.py` as a single command `python -m learned_opponents.train --variant {baseline|randomized} --seed <int>` that trains the Policy with PPO under the configured `Training_Budget` and writes `Run_Artifacts` (resolved config, seed, checkpoint, commit) to `runs/<variant>/seed<seed>/`; on MJX/RTX 3080 set `JAX_DEFAULT_MATMUL_PRECISION=highest`; `Training_Budget`, PPO hyperparameters, and seeds are read from `config/train.yaml` (_Requirements: 4.1, 4.4, 4.5, 4.6, 4.7, 0.10_).
     - Add `scripts/train.sh <variant> <seed>`, which starts training detached with log, pid, and exit files as the design describes, and refuses to start a reported seed if the tree is dirty or another GPU job is running.
     - Demo/verify: one command trains a short baseline run and leaves `runs/baseline/seed<seed>/` with config, seed, checkpoint, and commit; the env var is set under MJX.
   - [x] 8.2 Write an example test for Run_Artifacts and the precision setting
     - Confirm a launched run writes the artifacts and that the MJX precision env var is set (single execution, marked `gpu`).
     - _Requirements: 4.4, 4.7, 0.10_
-  - [ ] 8.3 Run the pilot and freeze the budget
+  - [x] 8.3 Run the pilot and freeze the budget
     - Train the pilot seed (100, never reported) to choose `training_budget_steps` and PPO hyperparameters per the design rule (at most 60 minutes per run on this GPU, pilot reaching `nominal_success_target` if possible). Train the final pilot setting twice and record the difference in nominal success as the measured training reproducibility tolerance (_Requirements: 0.3_).
     - Freeze and commit `config/train.yaml`, `config/task.yaml`, and `config/domain_rand.yaml`; no later task may change them.
     - _Requirements: 4.1, 4.5, 0.3_
@@ -159,7 +159,7 @@ flowchart TD
 
 ### M3 — Randomized training and robustness grid
 
-- [ ] 10. Train the randomized variant across seeds
+- [x] 10. Train the randomized variant across seeds
   - Train randomized seeds 0, 1, 2 one after another under the identical frozen `Training_Budget`, writing all `Run_Artifacts`; add `scripts/train_all.sh`, which reproduces all six reported runs from one command; record the launching command, seeds, and commit (_Requirements: 4.1, 4.3, 4.4_).
   - Demo/verify: `runs/baseline/` and `runs/randomized/` each hold 3 seed directories with checkpoints.
   - _Requirements: 4.1, 4.3, 4.4_
@@ -223,7 +223,7 @@ flowchart TD
     - _Properties: 14 — Requirements: 9.3, 9.4_
 
 - [ ] 18. Wire CI, finish the tests, and assemble the README
-  - [ ] 18.1 Add GitHub Actions CI (`.github/workflows/ci.yml`) that installs `requirements-ci.txt` and runs `pytest -m "not gpu"` on push (all branches) and pull request, reporting a failed status when any test fails (_Requirements: 10.4, 10.5_).
+  - [x] 18.1 Add GitHub Actions CI (`.github/workflows/ci.yml`) that installs `requirements-ci.txt` and runs `pytest -m "not gpu"` on push (all branches) and pull request, reporting a failed status when any test fails (_Requirements: 10.4, 10.5_).
     - Demo/verify: push and confirm a green run with `gh run watch`; then push a commit with one intentionally failing test to a temporary branch `ci-fail-check`, confirm that run is red, and delete the branch locally and on GitHub. Never force-push and never rewrite history.
   - [ ] 18.2 Write pytest unit tests for metrics, summary, and plotting wiring
     - Cover CI formatting and summary generation on synthetic results with known answers (runs in CI).

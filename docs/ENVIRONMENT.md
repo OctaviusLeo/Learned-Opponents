@@ -186,3 +186,13 @@ Sat Oct 17 19:28:06 2026
 +-----------------------------------------------------------------------------------------+
 ```
 <!-- END smoke -->
+
+## Shared GPU during the reported training runs
+
+While the pilot-reproducibility and the six reported training runs executed (2026-10-17,
+21:23-22:12 EDT, commit `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f`), jobs from three other
+repositories on this machine (Grounded-QA-Service, Finetune-And-Serve, Agent-Injection-Bench)
+were running in the same WSL distro and on the same GPU. Throughput fell from about 149k to
+about 81k env-steps/s and run wall times ranged from 3.7 to 6.8 minutes
+(`runs/<variant>/seed<seed>/summary.json`). Wall time is the only quantity this affects; every run
+used the identical 30,081,024-step budget, and none came close to the 60-minute cap.

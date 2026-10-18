@@ -37,3 +37,16 @@ variant; the pooled interval covers episode sampling only, so each seed's own ra
 
 Chosen `training_budget_steps` = **30,081,024** (Success_Rate 0.972; best 0.981; target met).
 Earlier pilot evidence (stopped runs and why): `docs/evidence/pilot/README.md`, `docs/evidence/pilot/pilot1_entropy0.005_checkpoints.json`, `docs/evidence/pilot/pilot1_entropy0.005_config.yaml`, `docs/evidence/pilot/pilot1_entropy0.005_train_log.csv`, `docs/evidence/pilot/pilot2_entropy0_checkpoints.json`, `docs/evidence/pilot/pilot2_entropy0_config.yaml`, `docs/evidence/pilot/pilot2_entropy0_train_log.csv`
+
+## Training reproducibility (pilot, never reported as a result)
+
+- Command: `python -m learned_opponents.train.pilot repro`
+- Commit: `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f`
+- Pilot seed 100 trained twice with the frozen config; each run evaluated at nominal parameters on evaluation seed pilot evaluation stream of seed 100 (4096 episodes)
+
+| Run | Success_Rate [95% CI] | Wall time |
+| --- | --- | --- |
+| repro_a | 0.975 [0.970, 0.979] | 4.9 min |
+| repro_b | 0.979 [0.974, 0.983] | 4.1 min |
+
+Measured training reproducibility tolerance on this GPU (absolute difference in nominal Success_Rate between the two runs): **0.004**.
