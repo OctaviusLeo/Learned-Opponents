@@ -75,6 +75,29 @@ def grid_section(eval_dir: Path) -> str:
     return "\n".join(lines)
 
 
+def glance_section(eval_dir: Path) -> str:
+    """Baseline vs randomized pooled Success_Rate per grid cell, side by side."""
+    data = _load(eval_dir, "grid.json")
+    if not data:
+        return ""
+    rows = {(r["variant"], r["parameter"], r["value"]): r for r in grid_rows(data)}
+    lines = ["## Robustness at a glance", "",
+             f"- Command: `{data['command']}`; commit `{data['commit']}`; evaluation seed {data['eval_seed']}; "
+             f"{data['episodes_per_cell']} episodes per training seed per cell, pooled over 3 seeds per variant "
+             "(full table with collision rates, times, and per-seed rates under \"Robustness grid\").", "",
+             "| Parameter | Value | Range | Baseline Success_Rate [95% CI] | Randomized Success_Rate [95% CI] | "
+             "Randomized - baseline |", "| --- | --- | --- | --- | --- | --- |"]
+    for param, values in data["grid"].items():
+        for v in values:
+            b, r = rows.get(("baseline", param, v)), rows.get(("randomized", param, v))
+            if not (b and r):
+                continue
+            lines.append(f"| {LABELS.get(param, param).split(' (')[0]} | {_fmt_value(param, v)} | "
+                         f"{'out' if b['outside'] else 'in'} | {M.fmt_rate(b['success'])} | "
+                         f"{M.fmt_rate(r['success'])} | {r['success'].rate - b['success'].rate:+.3f} |")
+    return "\n".join(lines) + "\n"
+
+
 def transfer_section(eval_dir: Path) -> str:
     data = _load(eval_dir, "transfer.json")
     if not data:
@@ -96,4 +119,4 @@ def transfer_section(eval_dir: Path) -> str:
     return "\n".join(lines) + "\n"
 
 
-SECTIONS = [grid_section, transfer_section]
+SECTIONS = [glance_section, grid_section, transfer_section]

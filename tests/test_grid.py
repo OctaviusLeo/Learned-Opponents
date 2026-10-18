@@ -129,3 +129,12 @@ def test_summary_and_plots_from_synthetic_results(tmp_path):
     for p in paths:
         assert p.stat().st_size > 10_000 and p.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
     assert np.isfinite(paths[0].stat().st_size)
+
+
+def test_glance_section_compares_variants(tmp_path):
+    (tmp_path / "grid.json").write_text(json.dumps(synthetic_grid()))
+    text = summary_sections.glance_section(tmp_path)
+    assert text.startswith("## Robustness at a glance")
+    # Out-of-range cells: baseline 800/1000, randomized 860/1000 per seed -> +0.060.
+    assert "| Mass scale | 2 | out | 0.800" in text and "+0.060 |" in text
+    assert text.count("\n| ") == 2 + 17          # header, rule, one row per cell
