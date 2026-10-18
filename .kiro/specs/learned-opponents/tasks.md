@@ -164,15 +164,15 @@ flowchart TD
   - Demo/verify: `runs/baseline/` and `runs/randomized/` each hold 3 seed directories with checkpoints.
   - _Requirements: 4.1, 4.3, 4.4_
 
-- [ ] 11. Implement the robustness grid and metrics
-  - [ ] 11.1 Implement `eval/robustness.py` sweeping `config/robustness_grid.yaml` (write it with the design defaults: one parameter at a time, each with values outside the training range) and reporting per cell the Success_Rate, Collision_Rate, and mean Time_To_Goal, each with a 95% CI over `episodes_per_cell` per seed, pooled across the 3 seeds, plus each seed's own success rate, with the aggregation method stated (_Requirements: 6.1, 6.2, 6.3_).
+- [x] 11. Implement the robustness grid and metrics
+  - [x] 11.1 Implement `eval/robustness.py` sweeping `config/robustness_grid.yaml` (write it with the design defaults: one parameter at a time, each with values outside the training range) and reporting per cell the Success_Rate, Collision_Rate, and mean Time_To_Goal, each with a 95% CI over `episodes_per_cell` per seed, pooled across the 3 seeds, plus each seed's own success rate, with the aggregation method stated (_Requirements: 6.1, 6.2, 6.3_).
     - Run it detached and poll; record the wall time.
     - Demo/verify: a one-command grid run on the checkpoints emits per-cell metrics with CIs for both variants, including out-of-range cells.
-  - [ ] 11.2 Write Hypothesis property test for the out-of-range grid guarantee
+  - [x] 11.2 Write Hypothesis property test for the out-of-range grid guarantee
     - **Property 11: Grid includes out-of-training-range values** (≥100 iterations over generated grid/range configs).
     - _Properties: 11 — Requirements: 6.1_
 
-- [ ] 12. Generate robustness plots and the summary file
+- [x] 12. Generate robustness plots and the summary file
   - Implement `plotting/plots.py` (Success_Rate vs each perturbed parameter, both variants on the same axes, CIs as error bars, out-of-range values marked) and `eval/summary.py` so one `eval.robustness` invocation saves plots to `results/` and writes `results/summary.md` (generated, never hand-edited); every number recorded with command/seed/commit (_Requirements: 6.4, 6.5, 6.6, 0.1_).
   - Demo/verify: a single command produces the per-parameter plots and `results/summary.md` with the full grid for both variants.
   - _Requirements: 6.4, 6.5, 6.6, 0.1_

@@ -84,3 +84,90 @@ Earlier pilot evidence (stopped runs and why): `docs/evidence/pilot/README.md`, 
 | repro_b | 0.979 [0.974, 0.983] | 4.1 min |
 
 Measured training reproducibility tolerance on this GPU (absolute difference in nominal Success_Rate between the two runs): **0.004**.
+
+## Robustness at a glance
+
+- Command: `python -m learned_opponents.eval.robustness `; commit `cb4144d8fab1d871d070eace89e18591aaed3b11`; evaluation seed 20261017; 1024 episodes per training seed per cell, pooled over 3 seeds per variant (full table with collision rates, times, and per-seed rates under "Robustness grid").
+
+| Parameter | Value | Range | Baseline Success_Rate [95% CI] | Randomized Success_Rate [95% CI] | Randomized - baseline |
+| --- | --- | --- | --- | --- | --- |
+| Mass scale | 0.5 | out | 0.970 [0.963, 0.975] | 0.951 [0.942, 0.958] | -0.019 |
+| Mass scale | 0.8 | in | 0.971 [0.964, 0.976] | 0.956 [0.948, 0.963] | -0.015 |
+| Mass scale | 1 | in | 0.973 [0.967, 0.978] | 0.949 [0.941, 0.956] | -0.024 |
+| Mass scale | 1.2 | in | 0.970 [0.963, 0.976] | 0.955 [0.947, 0.962] | -0.015 |
+| Mass scale | 1.5 | out | 0.971 [0.965, 0.977] | 0.957 [0.949, 0.964] | -0.014 |
+| Mass scale | 2 | out | 0.972 [0.965, 0.977] | 0.959 [0.951, 0.965] | -0.013 |
+| Wheel friction scale | 0.3 | out | 0.967 [0.961, 0.973] | 0.957 [0.949, 0.963] | -0.011 |
+| Wheel friction scale | 0.6 | in | 0.971 [0.964, 0.976] | 0.956 [0.948, 0.963] | -0.015 |
+| Wheel friction scale | 0.9 | in | 0.972 [0.966, 0.978] | 0.949 [0.941, 0.956] | -0.023 |
+| Wheel friction scale | 1.2 | in | 0.971 [0.964, 0.976] | 0.952 [0.944, 0.959] | -0.019 |
+| Wheel friction scale | 1.5 | out | 0.969 [0.962, 0.974] | 0.952 [0.944, 0.959] | -0.017 |
+| Latency | 0 | in | 0.974 [0.968, 0.979] | 0.949 [0.940, 0.956] | -0.025 |
+| Latency | 1 | in | 0.974 [0.967, 0.979] | 0.964 [0.957, 0.970] | -0.010 |
+| Latency | 2 | in | 0.952 [0.944, 0.959] | 0.961 [0.953, 0.967] | +0.008 |
+| Latency | 3 | out | 0.543 [0.525, 0.561] | 0.952 [0.944, 0.959] | +0.409 |
+| Latency | 4 | out | 0.131 [0.119, 0.143] | 0.896 [0.885, 0.907] | +0.766 |
+| Latency | 6 | out | 0.053 [0.045, 0.061] | 0.398 [0.381, 0.416] | +0.346 |
+
+## Robustness grid
+
+- Command: `python -m learned_opponents.eval.robustness `
+- Commit: `cb4144d8fab1d871d070eace89e18591aaed3b11`
+- Evaluation seed 20261017; 1024 episodes per training seed per cell (the same layouts in every cell); training seeds 0, 1, 2 per variant; deterministic actions; one parameter varied at a time, the rest nominal; a latency value sets both the action and the observation delay. Sweep wall time 671 s.
+- Aggregation: episodes are pooled across the training seeds (Wilson interval on the pooled count; t interval on the pooled successful times); the last column lists each seed's own Success_Rate.
+- `out` marks values outside the randomized variant's training range mass_scale 0.8-1.2; friction_scale 0.6-1.2; latency_steps 0-2.
+
+### Mass scale
+
+| Variant | Value | Range | Success_Rate [95% CI] | Collision_Rate [95% CI] | Mean Time_To_Goal [95% CI] | Per-seed Success_Rate |
+| --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0.5 | out | 0.970 [0.963, 0.975] | 0.006 [0.004, 0.010] | 5.10 [5.03, 5.16] s | 0: 0.970, 1: 0.956, 2: 0.983 |
+| baseline | 0.8 | in | 0.971 [0.964, 0.976] | 0.009 [0.007, 0.014] | 5.09 [5.03, 5.15] s | 0: 0.972, 1: 0.963, 2: 0.978 |
+| baseline | 1 | in | 0.973 [0.967, 0.978] | 0.006 [0.004, 0.009] | 5.09 [5.03, 5.15] s | 0: 0.974, 1: 0.964, 2: 0.982 |
+| baseline | 1.2 | in | 0.970 [0.963, 0.976] | 0.007 [0.005, 0.011] | 5.08 [5.02, 5.15] s | 0: 0.970, 1: 0.963, 2: 0.978 |
+| baseline | 1.5 | out | 0.971 [0.965, 0.977] | 0.005 [0.003, 0.008] | 5.08 [5.02, 5.14] s | 0: 0.975, 1: 0.963, 2: 0.977 |
+| baseline | 2 | out | 0.972 [0.965, 0.977] | 0.004 [0.002, 0.007] | 5.13 [5.07, 5.20] s | 0: 0.974, 1: 0.962, 2: 0.979 |
+| randomized | 0.5 | out | 0.951 [0.942, 0.958] | 0.016 [0.012, 0.021] | 5.22 [5.16, 5.29] s | 0: 0.961, 1: 0.938, 2: 0.953 |
+| randomized | 0.8 | in | 0.956 [0.948, 0.963] | 0.014 [0.011, 0.019] | 5.19 [5.12, 5.25] s | 0: 0.972, 1: 0.945, 2: 0.951 |
+| randomized | 1 | in | 0.949 [0.941, 0.956] | 0.019 [0.015, 0.024] | 5.19 [5.12, 5.25] s | 0: 0.964, 1: 0.934, 2: 0.949 |
+| randomized | 1.2 | in | 0.955 [0.947, 0.962] | 0.015 [0.012, 0.020] | 5.20 [5.13, 5.26] s | 0: 0.971, 1: 0.938, 2: 0.956 |
+| randomized | 1.5 | out | 0.957 [0.949, 0.964] | 0.013 [0.010, 0.018] | 5.18 [5.11, 5.24] s | 0: 0.970, 1: 0.946, 2: 0.955 |
+| randomized | 2 | out | 0.959 [0.951, 0.965] | 0.013 [0.010, 0.018] | 5.21 [5.14, 5.27] s | 0: 0.974, 1: 0.943, 2: 0.960 |
+
+Plot: `results/robustness_mass_scale.png`
+
+### Wheel friction scale
+
+| Variant | Value | Range | Success_Rate [95% CI] | Collision_Rate [95% CI] | Mean Time_To_Goal [95% CI] | Per-seed Success_Rate |
+| --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0.3 | out | 0.967 [0.961, 0.973] | 0.009 [0.007, 0.014] | 5.46 [5.40, 5.52] s | 0: 0.966, 1: 0.956, 2: 0.980 |
+| baseline | 0.6 | in | 0.971 [0.964, 0.976] | 0.007 [0.005, 0.011] | 5.19 [5.12, 5.25] s | 0: 0.971, 1: 0.963, 2: 0.979 |
+| baseline | 0.9 | in | 0.972 [0.966, 0.978] | 0.007 [0.004, 0.010] | 5.09 [5.02, 5.15] s | 0: 0.975, 1: 0.963, 2: 0.979 |
+| baseline | 1.2 | in | 0.971 [0.964, 0.976] | 0.007 [0.005, 0.011] | 5.11 [5.05, 5.18] s | 0: 0.975, 1: 0.962, 2: 0.977 |
+| baseline | 1.5 | out | 0.969 [0.962, 0.974] | 0.008 [0.006, 0.012] | 5.19 [5.12, 5.25] s | 0: 0.971, 1: 0.961, 2: 0.975 |
+| randomized | 0.3 | out | 0.957 [0.949, 0.963] | 0.017 [0.013, 0.022] | 5.40 [5.34, 5.47] s | 0: 0.972, 1: 0.940, 2: 0.958 |
+| randomized | 0.6 | in | 0.956 [0.948, 0.963] | 0.015 [0.011, 0.020] | 5.25 [5.18, 5.31] s | 0: 0.972, 1: 0.941, 2: 0.955 |
+| randomized | 0.9 | in | 0.949 [0.941, 0.956] | 0.020 [0.015, 0.025] | 5.20 [5.14, 5.27] s | 0: 0.959, 1: 0.932, 2: 0.957 |
+| randomized | 1.2 | in | 0.952 [0.944, 0.959] | 0.017 [0.013, 0.022] | 5.19 [5.12, 5.25] s | 0: 0.967, 1: 0.936, 2: 0.954 |
+| randomized | 1.5 | out | 0.952 [0.944, 0.959] | 0.017 [0.013, 0.022] | 5.20 [5.14, 5.27] s | 0: 0.972, 1: 0.936, 2: 0.949 |
+
+Plot: `results/robustness_friction_scale.png`
+
+### Latency (action + observation, control steps)
+
+| Variant | Value | Range | Success_Rate [95% CI] | Collision_Rate [95% CI] | Mean Time_To_Goal [95% CI] | Per-seed Success_Rate |
+| --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0 | in | 0.974 [0.968, 0.979] | 0.006 [0.003, 0.009] | 5.09 [5.03, 5.15] s | 0: 0.974, 1: 0.965, 2: 0.983 |
+| baseline | 1 | in | 0.974 [0.967, 0.979] | 0.009 [0.007, 0.014] | 5.39 [5.33, 5.46] s | 0: 0.976, 1: 0.963, 2: 0.982 |
+| baseline | 2 | in | 0.952 [0.944, 0.959] | 0.020 [0.016, 0.026] | 7.21 [7.09, 7.32] s | 0: 0.962, 1: 0.934, 2: 0.962 |
+| baseline | 3 | out | 0.543 [0.525, 0.561] | 0.074 [0.065, 0.084] | 10.13 [9.90, 10.37] s | 0: 0.453, 1: 0.411, 2: 0.765 |
+| baseline | 4 | out | 0.131 [0.119, 0.143] | 0.181 [0.168, 0.195] | 6.13 [5.81, 6.46] s | 0: 0.095, 1: 0.117, 2: 0.180 |
+| baseline | 6 | out | 0.053 [0.045, 0.061] | 0.590 [0.573, 0.607] | 5.31 [5.08, 5.54] s | 0: 0.050, 1: 0.037, 2: 0.071 |
+| randomized | 0 | in | 0.949 [0.940, 0.956] | 0.019 [0.015, 0.025] | 5.19 [5.12, 5.25] s | 0: 0.963, 1: 0.934, 2: 0.949 |
+| randomized | 1 | in | 0.964 [0.957, 0.970] | 0.013 [0.009, 0.017] | 5.22 [5.16, 5.29] s | 0: 0.985, 1: 0.947, 2: 0.959 |
+| randomized | 2 | in | 0.961 [0.953, 0.967] | 0.017 [0.013, 0.022] | 5.42 [5.35, 5.49] s | 0: 0.974, 1: 0.952, 2: 0.957 |
+| randomized | 3 | out | 0.952 [0.944, 0.959] | 0.026 [0.021, 0.033] | 5.85 [5.77, 5.92] s | 0: 0.969, 1: 0.949, 2: 0.938 |
+| randomized | 4 | out | 0.896 [0.885, 0.907] | 0.073 [0.065, 0.083] | 6.88 [6.76, 6.99] s | 0: 0.899, 1: 0.888, 2: 0.902 |
+| randomized | 6 | out | 0.398 [0.381, 0.416] | 0.329 [0.312, 0.346] | 7.67 [7.46, 7.89] s | 0: 0.249, 1: 0.203, 2: 0.743 |
+
+Plot: `results/robustness_latency_steps.png`
