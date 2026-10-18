@@ -225,7 +225,7 @@ flowchart TD
 - [ ] 18. Wire CI, finish the tests, and assemble the README
   - [x] 18.1 Add GitHub Actions CI (`.github/workflows/ci.yml`) that installs `requirements-ci.txt` and runs `pytest -m "not gpu"` on push (all branches) and pull request, reporting a failed status when any test fails (_Requirements: 10.4, 10.5_).
     - Demo/verify: push and confirm a green run with `gh run watch`; then push a commit with one intentionally failing test to a temporary branch `ci-fail-check`, confirm that run is red, and delete the branch locally and on GitHub. Never force-push and never rewrite history.
-  - [ ] 18.2 Write pytest unit tests for metrics, summary, and plotting wiring
+  - [x] 18.2 Write pytest unit tests for metrics, summary, and plotting wiring
     - Cover CI formatting and summary generation on synthetic results with known answers (runs in CI).
     - _Requirements: 10.2_
   - [ ] 18.3 Fill the README: research question, method, robustness plots, transfer table (both sourced from the generated `results/summary.md`, not hand edits), the gameplay GIF with its caption, per-number reproduction steps, per-suite test commands (WSL `pytest`, CI `pytest -m "not gpu"`, `scripts/run_ue_tests.ps1`, parity), and the design's known limitations; cite each result with its command, seed, and full commit hash (_Requirements: 11.1, 11.2, 11.3, 10.6_).
