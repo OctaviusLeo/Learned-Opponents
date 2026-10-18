@@ -177,7 +177,7 @@ flowchart TD
   - Demo/verify: a single command produces the per-parameter plots and `results/summary.md` with the full grid for both variants.
   - _Requirements: 6.4, 6.5, 6.6, 0.1_
 
-- [ ] 12g. **Automated gate (M3):** run the full `pytest` and check that `results/summary.md` holds every grid cell for both variants and that one plot per parameter exists; proceed when all exit 0. No manual review stop.
+- [x] 12g. **Automated gate (M3):** run the full `pytest` and check that `results/summary.md` holds every grid cell for both variants and that one plot per parameter exists; proceed when all exit 0. No manual review stop.
 
 ### M4 — ONNX export and parity
 
