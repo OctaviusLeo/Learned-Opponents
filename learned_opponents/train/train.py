@@ -137,7 +137,8 @@ LOG_FIELDS = ["iteration", "env_steps", "elapsed_s", "env_steps_per_s", "episode
               "entropy"]
 
 
-def run(resolved: dict[str, Any], out_dir: Path, max_minutes: float | None = None) -> dict[str, Any]:
+def run(resolved: dict[str, Any], out_dir: Path, max_minutes: float | None = None,
+        checkpoint_every_steps: int | None = None) -> dict[str, Any]:
     import numpy as np
     import torch
     from rsl_rl.algorithms import PPO
@@ -194,6 +195,10 @@ def run(resolved: dict[str, Any], out_dir: Path, max_minutes: float | None = Non
                    "surrogate_loss": losses.get("surrogate", float("nan")),
                    "entropy": losses.get("entropy", float("nan"))}
             writer.writerow({k: row.get(k) for k in LOG_FIELDS})
+            if checkpoint_every_steps and (it + 1) * steps_per_it // checkpoint_every_steps > it * steps_per_it // checkpoint_every_steps:
+                (out_dir / "checkpoints").mkdir(exist_ok=True)
+                torch.save({**alg.save(), "iter": it + 1, "env_steps": (it + 1) * steps_per_it},
+                           out_dir / "checkpoints" / f"iter{it + 1:05d}.pt")
             if (it + 1) % 10 == 0 or it == 0 or it + 1 == iters:
                 logf.flush()
                 print(f"it {it + 1}/{iters} steps {row['env_steps']:,} {row['env_steps_per_s']:,}/s "
@@ -224,6 +229,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--set", dest="overrides", action="append", default=[], metavar="SECTION.KEY=VALUE")
     ap.add_argument("--max-minutes", type=float, help="stop early after this wall time (pilot exploration)")
     ap.add_argument("--force", action="store_true", help="overwrite an existing checkpoint")
+    ap.add_argument("--checkpoint-every-steps", type=int, help="also save checkpoints/iterNNNNN.pt (pilot curve)")
     args = ap.parse_args(argv)
     resolved = resolve(args.variant, args.seed, args.overrides)
     out = args.out or (cfglib.REPO_ROOT / "runs" / args.variant / f"seed{args.seed}")
@@ -231,7 +237,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"refusing: {out}/checkpoint.pt exists (pass --force to overwrite)", file=sys.stderr)
         return 2
     os.environ.setdefault("LO_COMMIT", resolved["commit"])
-    run(resolved, out, args.max_minutes)
+    run(resolved, out, args.max_minutes, args.checkpoint_every_steps)
     return 0
 
 

@@ -45,12 +45,13 @@ def load_run_config(run_dir: str | Path) -> dict[str, Any]:
         return yaml.safe_load(f)
 
 
-def load_actor(run_dir: str | Path, device: str = "cpu") -> tuple[MLPModel, dict[str, Any]]:
-    """Actor from ``<run_dir>/checkpoint.pt`` with the run's resolved config, in eval mode."""
+def load_actor(run_dir: str | Path, device: str = "cpu",
+               checkpoint: str | Path | None = None) -> tuple[MLPModel, dict[str, Any]]:
+    """Actor from ``<run_dir>/checkpoint.pt`` (or ``checkpoint``) with the run's resolved config, in eval mode."""
     cfg = load_run_config(run_dir)
     obs_dim = int(cfg["task"]["n_rays"]) + 5
     actor = build_actor(obs_dim, cfg["train"], device)
-    state = torch.load(Path(run_dir) / "checkpoint.pt", map_location=device, weights_only=False)
+    state = torch.load(checkpoint or Path(run_dir) / "checkpoint.pt", map_location=device, weights_only=False)
     actor.load_state_dict(state["actor_state_dict"])
     actor.eval()
     return actor, cfg

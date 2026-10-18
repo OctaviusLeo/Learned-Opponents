@@ -50,3 +50,16 @@ def test_invalid_train_values_are_rejected(key, value):
     train[key] = value
     with pytest.raises(cfglib.ConfigError, match=key):
         tr.validate_train(train)
+
+
+def test_pilot_budget_rule():
+    from learned_opponents.train.pilot import choose_budget
+
+    pts = [{"env_steps": s, "elapsed_min": s / 1e7, "success_rate": r}
+           for s, r in [(1e7, 0.70), (2e7, 0.85), (3e7, 0.905), (4e7, 0.91), (9e8, 0.99)]]
+    c = choose_budget(pts, target=0.8, max_minutes=60)          # the 9e8 point is over the time cap
+    assert c["chosen_env_steps"] == 3e7 and c["best_success_rate"] == 0.91 and c["meets_target"]
+    low = choose_budget(pts[:2], target=0.9, max_minutes=60)     # target not reached: best is kept
+    assert low["chosen_env_steps"] == 2e7 and not low["meets_target"]
+    with pytest.raises(ValueError):
+        choose_budget(pts[4:], target=0.8, max_minutes=60)
