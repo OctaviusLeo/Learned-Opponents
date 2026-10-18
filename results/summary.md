@@ -171,3 +171,15 @@ Plot: `results/robustness_friction_scale.png`
 | randomized | 6 | out | 0.398 [0.381, 0.416] | 0.329 [0.312, 0.346] | 7.67 [7.46, 7.89] s | 0: 0.249, 1: 0.203, 2: 0.743 |
 
 Plot: `results/robustness_latency_steps.png`
+
+## Transfer check (MuJoCo vs Unreal, same layouts)
+
+- Command: `powershell -File scripts/run_transfer.ps1`
+- Commit: `9aed9521952e633b73c8b7c76e2a76aa190063da`
+- 50 layouts from `results/transfer/episodes.json` (layout seed 50505) x 3 training seeds per variant, nominal parameters, deterministic actions; the game runs headless and steps each episode at control_dt_s.
+- Transfer_Gap = MuJoCo Success_Rate - in-game Success_Rate on the same episodes, reported as measured (nothing tuned to shrink it).
+
+| Variant | Episodes | MuJoCo Success_Rate [95% CI] | In-game Success_Rate [95% CI] | Transfer_Gap | In-game Collision_Rate [95% CI] |
+| --- | --- | --- | --- | --- | --- |
+| baseline | 150 | 0.993 [0.963, 0.999] | 0.980 [0.943, 0.993] | +0.013 | 0.013 [0.004, 0.047] |
+| randomized | 150 | 0.953 [0.907, 0.977] | 0.940 [0.890, 0.968] | +0.013 | 0.040 [0.018, 0.085] |

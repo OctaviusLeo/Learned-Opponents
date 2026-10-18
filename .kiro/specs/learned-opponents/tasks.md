@@ -215,10 +215,10 @@ flowchart TD
     - Demo/verify: a short `-game` launch on this desktop shows the opponent moving under ONNX inference and reaching checkpoints; `docs/media/gameplay.gif` exists and is under 10 MB.
     - _Requirements: 8.1, 8.2_
 
-- [ ] 17. Implement the transfer check
-  - [ ] 17.1 Write `results/transfer/episodes.json` (50 layouts from a fixed seed with `env/obstacles.py`), evaluate all six policies on those layouts in MuJoCo at nominal parameters with deterministic actions, implement the headless frame-rate-independent `Transfer/` harness and `/Game/Maps/TransferArena` in Unreal as design.md describes, and implement `scripts/run_transfer.ps1`, which runs all six policies on all 50 layouts in-game (150 episodes per variant), saves per-episode results, and writes each variant's in-Game Success_Rate with a 95% CI, the matching MuJoCo Success_Rate on the same episodes, and the Transfer_Gap to `results/summary.md`, reported as-is with nothing tuned to shrink it; every number recorded with command/seed/commit (_Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_).
+- [x] 17. Implement the transfer check
+  - [x] 17.1 Write `results/transfer/episodes.json` (50 layouts from a fixed seed with `env/obstacles.py`), evaluate all six policies on those layouts in MuJoCo at nominal parameters with deterministic actions, implement the headless frame-rate-independent `Transfer/` harness and `/Game/Maps/TransferArena` in Unreal as design.md describes, and implement `scripts/run_transfer.ps1`, which runs all six policies on all 50 layouts in-game (150 episodes per variant), saves per-episode results, and writes each variant's in-Game Success_Rate with a 95% CI, the matching MuJoCo Success_Rate on the same episodes, and the Transfer_Gap to `results/summary.md`, reported as-is with nothing tuned to shrink it; every number recorded with command/seed/commit (_Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_).
     - Demo/verify: one command produces the transfer table in `results/summary.md` with 150 episodes per variant.
-  - [ ] 17.2 Write Hypothesis property test for the transfer-gap computation
+  - [x] 17.2 Write Hypothesis property test for the transfer-gap computation
     - **Property 14: Transfer gap equals the measured difference** (≥100 iterations).
     - _Properties: 14 — Requirements: 9.3, 9.4_
 
