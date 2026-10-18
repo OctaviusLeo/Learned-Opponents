@@ -68,9 +68,14 @@ CI installs only `requirements-ci.txt` (no CUDA wheels) on Python 3.12.
 
 The editor target builds with `scripts\build_game.ps1` (zero errors; the only warnings are engine-header
 C4996 deprecations). `scripts\run_ue_tests.ps1` runs the `LearnedOpponents.*` automation tests
-headless; the first run passed all five non-inference tests, and
-`LearnedOpponents.Obs.EngineAgnosticFixtures` measured a worst |C++ - Python| of 0 over the 128
-fixture cases (tolerance 1e-5).
+headless. With the six exported models in place all six tests pass (report:
+`docs/evidence/ue_tests_index.json`): `LearnedOpponents.Obs.EngineAgnosticFixtures` measured a
+worst |C++ - Python| of 0 over the 128 fixture cases (tolerance 1e-5), and
+`LearnedOpponents.Inference.ParityAllModels` ran every model through `NNERuntimeORTCpu` on its
+1000 parity observations with a worst |NNE - Python| of 3.99e-6 (tolerance 1e-4). The model data
+is created at runtime with `UNNEModelData::Init("onnx", bytes)`; no editor import is used. In-engine
+inference therefore runs on Unreal's NNE with the ONNX Runtime backend, and the Godot fallback was
+not needed.
 
 ## GPU settings for JAX (MJX)
 

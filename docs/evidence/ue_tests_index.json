@@ -1,0 +1,205 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "PC",
+			"instance": "A1802ED848F3CC917BB09589F3B93BF8",
+			"instanceName": "PC-158180",
+			"platform": "WindowsEditor",
+			"oSVersion": "Windows 11 (25H2) [10.0.26200.9711] ",
+			"model": "Default",
+			"gPU": "NVIDIA GeForce RTX 3080",
+			"cPUModel": "AMD Ryzen 9 5900X 12-Core Processor            ",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.10.18-03.13.53",
+	"succeeded": 6,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.52882754802703857,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "ParityAllModels",
+			"fullTestPath": "LearnedOpponents.Inference.ParityAllModels",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"A1802ED848F3CC917BB09589F3B93BF8"
+			],
+			"duration": 0.38164389133453369,
+			"dateTime": "2026.10.18-03.13.53",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "baseline_seed0: 1000 observations, max |NNE - Python| 2.5e-06 at observation 635",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.10.18-03.13.53"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "baseline_seed1: 1000 observations, max |NNE - Python| 2.38e-06 at observation 779",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.10.18-03.13.53"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "baseline_seed2: 1000 observations, max |NNE - Python| 3.99e-06 at observation 684",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.10.18-03.13.53"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "randomized_seed0: 1000 observations, max |NNE - Python| 2.15e-06 at observation 916",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.10.18-03.13.53"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "randomized_seed1: 1000 observations, max |NNE - Python| 1.19e-06 at observation 955",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.10.18-03.13.53"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "randomized_seed2: 1000 observations, max |NNE - Python| 2.03e-06 at observation 738",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.10.18-03.13.53"
+				}
+			],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "EngineAgnosticFixtures",
+			"fullTestPath": "LearnedOpponents.Obs.EngineAgnosticFixtures",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"A1802ED848F3CC917BB09589F3B93BF8"
+			],
+			"duration": 0.018651802092790604,
+			"dateTime": "2026.10.18-03.13.53",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "128 cases, worst |C++ - Python| = 0 (tolerance 1e-05)",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.10.18-03.13.53"
+				}
+			],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "KnownRaycasts",
+			"fullTestPath": "LearnedOpponents.Obs.KnownRaycasts",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"A1802ED848F3CC917BB09589F3B93BF8"
+			],
+			"duration": 0.0056455023586750031,
+			"dateTime": "2026.10.18-03.13.53",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "TracedKnownDistances",
+			"fullTestPath": "LearnedOpponents.Obs.TracedKnownDistances",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"A1802ED848F3CC917BB09589F3B93BF8"
+			],
+			"duration": 0.089624799787998199,
+			"dateTime": "2026.10.18-03.13.53",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "KinematicsAndCollision",
+			"fullTestPath": "LearnedOpponents.Race.KinematicsAndCollision",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"A1802ED848F3CC917BB09589F3B93BF8"
+			],
+			"duration": 0.030631698668003082,
+			"dateTime": "2026.10.18-03.13.53",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "SpecDefaults",
+			"fullTestPath": "LearnedOpponents.Smoke.SpecDefaults",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"A1802ED848F3CC917BB09589F3B93BF8"
+			],
+			"duration": 0.0026297979056835175,
+			"dateTime": "2026.10.18-03.13.53",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}
