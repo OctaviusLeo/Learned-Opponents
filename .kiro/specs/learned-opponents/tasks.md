@@ -196,7 +196,7 @@ flowchart TD
     - **Property 13: Parity failure reports the worst disagreement** (≥100 iterations).
     - _Properties: 12, 13 — Requirements: 7.3, 7.4, 7.5_
 
-- [ ] 14g. **Automated gate (M4):** run `python -m learned_opponents.export.parity` on all six models and the full `pytest`; proceed when both exit 0. No manual review stop.
+- [x] 14g. **Automated gate (M4):** run `python -m learned_opponents.export.parity` on all six models and the full `pytest`; proceed when both exit 0. No manual review stop.
 
 ### M5 — Game, in-engine inference, transfer check, README
 
