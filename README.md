@@ -272,7 +272,7 @@ against 128 Python-generated cases.
 
 ## Repository
 
-Portfolio project; no license is granted. Third-party packages and licenses:
+Code is released under the [MIT License](LICENSE); Unreal Engine and its content are not redistributed. Third-party packages and licenses:
 [`THIRD_PARTY.md`](THIRD_PARTY.md).
 
 ## How this was built

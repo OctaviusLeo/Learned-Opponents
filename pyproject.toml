@@ -1,4 +1,4 @@
-# Private portfolio repository: no license field and no packaging for PyPI.
+# Licensed under MIT (see LICENSE); no packaging for PyPI.
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "learned-opponents"
 version = "0.0.0"
-description = "Learned Opponents: domain-randomized navigation policies trained in MuJoCo Warp and raced in Unreal (private portfolio project)."
+description = "Learned Opponents: domain-randomized navigation policies trained in MuJoCo Warp and raced in Unreal (portfolio project)."
 requires-python = ">=3.12,<3.13"
 
 # GPU-free core: the spec, randomization, metrics, summary, plotting, and the
