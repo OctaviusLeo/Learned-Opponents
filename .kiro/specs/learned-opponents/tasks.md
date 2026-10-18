@@ -155,7 +155,7 @@ flowchart TD
     - Train baseline seeds 0, 1, 2 one after another with `scripts/train.sh`, polling each to completion. Run the nominal evaluation and write the result, with command, seeds, and commit, to `results/summary.md`. If the target is missed, report the real value and cause; do not loosen anything (_Requirements: 4.3, 5.2, 5.3, 0.4_).
     - _Requirements: 4.3, 4.4, 5.2, 5.3, 0.1, 0.4_
 
-- [ ] 9g. **Automated gate (M2):** check that `runs/baseline/seed{0,1,2}/` hold complete Run_Artifacts, that `results/summary.md` holds the nominal result with command, seed, and commit, and that the full `pytest` passes; proceed when all exit 0. A missed target is reported, not a gate failure. No manual review stop.
+- [x] 9g. **Automated gate (M2):** check that `runs/baseline/seed{0,1,2}/` hold complete Run_Artifacts, that `results/summary.md` holds the nominal result with command, seed, and commit, and that the full `pytest` passes; proceed when all exit 0. A missed target is reported, not a gate failure. No manual review stop.
 
 ### M3 — Randomized training and robustness grid
 
