@@ -17,7 +17,7 @@ ppo:
   schedule: adaptive               # KL-adaptive learning rate
   desired_kl: 0.01
   clip_param: 0.2
-  entropy_coef: 0.005
+  entropy_coef: 0.0                # pilot 1 with 0.005: action std diverged (1.0 -> 5.1 in 40M steps) under env-side clipping and deterministic success fell 0.951 -> 0.922 (docs/evidence/pilot/)
   value_loss_coef: 1.0
   max_grad_norm: 1.0
   gamma: 0.99

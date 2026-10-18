@@ -1,0 +1,129 @@
+variant: baseline
+seed: 100
+commit: cfb67456a590607da909c97a964db70c8bc64e57
+overrides:
+- train.training_budget_steps=400000000
+task:
+  arena_size_m: 8.0
+  wall_height_m: 0.5
+  n_obstacles:
+  - 4
+  - 8
+  obstacle_size_m:
+  - 0.3
+  - 1.0
+  obstacle_height_m: 0.5
+  obstacle_kinds:
+  - box
+  - cylinder
+  start_goal_clearance_m: 0.1
+  min_start_goal_distance_m: 2.0
+  robot_radius_m: 0.15
+  wheel_radius_m: 0.05
+  track_width_m: 0.3
+  max_wheel_speed: 20.0
+  chassis_mass_kg: 2.0
+  wheel_mass_kg: 0.1
+  wheel_friction: 1.0
+  motor_kv: 0.05
+  motor_torque_limit_nm: 0.3
+  n_rays: 24
+  ray_fov_deg: 360.0
+  ray_height_m: 0.15
+  max_range_m: 4.0
+  control_dt_s: 0.05
+  physics_dt_s: 0.01
+  episode_limit: 400
+  arrival_tolerance_m: 0.25
+  reward:
+    w_progress: 1.0
+    w_success: 10.0
+    w_collision: 10.0
+    w_time: 0.0
+  nominal_success_target: 0.8
+  eval_episodes_per_seed: 1024
+  eval_seed: 20261017
+train:
+  training_budget_steps: 400000000
+  num_parallel_envs: 4096
+  max_minutes_per_run: 60
+  bank_size: 262144
+  device: cuda:0
+  ppo:
+    num_steps_per_env: 24
+    num_learning_epochs: 5
+    num_mini_batches: 4
+    learning_rate: 0.001
+    schedule: adaptive
+    desired_kl: 0.01
+    clip_param: 0.2
+    entropy_coef: 0.005
+    value_loss_coef: 1.0
+    max_grad_norm: 1.0
+    gamma: 0.99
+    lam: 0.95
+    use_clipped_value_loss: true
+  policy:
+    hidden_sizes:
+    - 256
+    - 256
+    activation: elu
+    init_std: 1.0
+    obs_normalization: true
+  seeds:
+    baseline:
+    - 0
+    - 1
+    - 2
+    randomized:
+    - 0
+    - 1
+    - 2
+    pilot:
+    - 100
+domain_rand:
+  mass_scale:
+    nominal: 1.0
+    range:
+    - 0.8
+    - 1.2
+  friction_scale:
+    nominal: 1.0
+    range:
+    - 0.6
+    - 1.2
+  motor_strength_scale:
+    nominal: 1.0
+    range:
+    - 0.8
+    - 1.2
+  sensor_noise_sigma_m:
+    nominal: 0.0
+    range:
+    - 0.0
+    - 0.05
+  action_latency_steps:
+    nominal: 0
+    range:
+    - 0
+    - 2
+  observation_latency_steps:
+    nominal: 0
+    range:
+    - 0
+    - 2
+iterations: 4070
+steps_per_iteration: 98304
+framework: mjlab / MuJoCo Warp, rsl-rl PPO
+framework_versions:
+  mjlab: 1.6.0
+  mujoco: 3.11.0
+  mujoco-warp: 3.11.0
+  warp-lang: 1.18.0
+  torch: 2.14.1
+  rsl-rl-lib: 5.4.2
+  tensordict: 0.15.1
+jax_default_matmul_precision: not applicable (MJX not chosen in M0)
+command: python -m learned_opponents.train --variant baseline --seed 100 --out runs/pilot/curve
+  --force --set train.training_budget_steps=400000000 --checkpoint-every-steps 10000000
+planned_env_steps: 400097280

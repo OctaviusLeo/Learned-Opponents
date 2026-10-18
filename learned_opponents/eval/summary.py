@@ -101,12 +101,34 @@ def pilot_section(r: Mapping[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def pilot_curve_section(r: Mapping[str, Any]) -> str:
+    lines = ["## Training budget selection (pilot, never reported as a result)", "",
+             f"- Command: `{r['command']}` after `{r['training_command']}`",
+             f"- Commit: `{r['commit']}` (pilot trained at `{r['train_commit']}`)",
+             f"- Pilot seed {r['seed']}, baseline variant; each checkpoint evaluated at nominal parameters on "
+             f"{r['episodes']} layouts from the pilot seed's evaluation stream (not the reported evaluation seed).",
+             f"- Rule: {r['rule']}", "",
+             "| Env steps | Wall time | Success_Rate [95% CI] | Collisions | Timeouts |", "| --- | --- | --- | --- | --- |"]
+    for p in r["points"]:
+        lines.append(f"| {p['env_steps']:,} | {p['elapsed_min']:.1f} min | "
+                     f"{M.fmt_rate(M.wilson(p['success'], p['n']))} | {p['collision']} | {p['timeout']} |")
+    lines += ["", f"Chosen `training_budget_steps` = **{r['chosen_env_steps']:,}** (Success_Rate "
+              f"{r['chosen_success_rate']:.3f}; best {r['best_success_rate']:.3f}; target "
+              f"{'met' if r['meets_target'] else 'not met'})."]
+    if r.get("history"):
+        lines.append("Earlier pilot evidence (stopped runs and why): " + ", ".join(f"`{h}`" for h in r["history"]))
+    return "\n".join(lines) + "\n"
+
+
 def render(eval_dir: Path = EVAL_DIR) -> str:
     parts = [HEADER]
     for variant in ("baseline", "randomized"):
         r = load(f"nominal_{variant}.json", eval_dir)
         if r:
             parts.append(nominal_section(r))
+    r = load("pilot_curve.json", eval_dir)
+    if r:
+        parts.append(pilot_curve_section(r))
     r = load("pilot_reproducibility.json", eval_dir)
     if r:
         parts.append(pilot_section(r))

@@ -1,0 +1,54 @@
+{
+ "note": "pilot 1 (entropy_coef 0.005) stopped at 43M steps because action std diverged; deterministic nominal evaluation of its checkpoints on the pilot layouts",
+ "command": "scratch evaluation via learned_opponents.train.pilot._evaluate",
+ "points": [
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00102.pt",
+   "iteration": 102,
+   "success": 3896,
+   "collision": 183,
+   "timeout": 17,
+   "n": 4096,
+   "success_rate": 0.951171875,
+   "env_steps": 10027008,
+   "elapsed_min": 1.0038333333333334,
+   "action_std": 0.6910058856010437
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00204.pt",
+   "iteration": 204,
+   "success": 3890,
+   "collision": 199,
+   "timeout": 7,
+   "n": 4096,
+   "success_rate": 0.94970703125,
+   "env_steps": 20054016,
+   "elapsed_min": 1.9666666666666666,
+   "action_std": 1.282118558883667
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00306.pt",
+   "iteration": 306,
+   "success": 3840,
+   "collision": 255,
+   "timeout": 1,
+   "n": 4096,
+   "success_rate": 0.9375,
+   "env_steps": 30081024,
+   "elapsed_min": 2.996166666666667,
+   "action_std": 2.7643074989318848
+  },
+  {
+   "checkpoint": "runs/pilot/curve/checkpoints/iter00407.pt",
+   "iteration": 407,
+   "success": 3777,
+   "collision": 317,
+   "timeout": 2,
+   "n": 4096,
+   "success_rate": 0.922119140625,
+   "env_steps": 40009728,
+   "elapsed_min": 4.053,
+   "action_std": 5.107272148132324
+  }
+ ]
+}

@@ -5,7 +5,7 @@
 set -euo pipefail
 source "$(dirname "$0")/lib/common.sh"
 cd "$REPO"
-HORIZON="${HORIZON:-400000000}"
+HORIZON="${HORIZON:-300000000}"
 EVERY="${EVERY:-10000000}"
 export LO_COMMIT="$(repo_commit)"
 "$PY" -m learned_opponents.train --variant baseline --seed 100 --out runs/pilot/curve --force \

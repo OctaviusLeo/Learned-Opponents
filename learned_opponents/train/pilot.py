@@ -92,7 +92,9 @@ def curve() -> int:
               "seed": rcfg["seed"], "eval_layout_seed": rcfg["seed"], "episodes": PILOT_EPISODES,
               "rule": __doc__.split("Budget rule")[1].split("\n\n")[0].strip(), "tolerance": TOLERANCE,
               "nominal_success_target": task["nominal_success_target"],
-              "max_minutes_per_run": train["max_minutes_per_run"], "points": points, **choice}
+              "max_minutes_per_run": train["max_minutes_per_run"], "points": points, **choice,
+              "history": sorted(str(p.relative_to(cfglib.REPO_ROOT)) for p in
+                                (cfglib.REPO_ROOT / "docs" / "evidence" / "pilot").glob("*"))}
     EVAL_DIR.mkdir(parents=True, exist_ok=True)
     with open(EVAL_DIR / "pilot_curve.json", "w", newline="\n") as f:
         json.dump(result, f, indent=1)
