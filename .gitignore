@@ -58,3 +58,8 @@ desktop.ini
 # Editor-created per-user content folders
 game/LearnedOpponents/Content/Developers/
 game/LearnedOpponents/Content/Collections/
+
+# IDE steering files and agent working files are local, not part of the project
+.kiro/steering/
+.kiro/specs/*/.config.kiro
+.agents/
