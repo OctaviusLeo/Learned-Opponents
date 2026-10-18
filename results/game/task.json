@@ -1,0 +1,22 @@
+{
+ "spec": {
+  "n_rays": 24,
+  "ray_fov_deg": 360.0,
+  "max_range_m": 4.0,
+  "arena_size_m": 8.0,
+  "wheel_radius_m": 0.05,
+  "track_width_m": 0.3,
+  "max_wheel_speed": 20.0
+ },
+ "robot_radius_m": 0.15,
+ "ray_height_m": 0.15,
+ "control_dt_s": 0.05,
+ "physics_dt_s": 0.01,
+ "arrival_tolerance_m": 0.25,
+ "wall_height_m": 0.5,
+ "obstacle_height_m": 0.5,
+ "episode_limit": 400,
+ "max_obstacles": 8,
+ "commit": "6ee2b047405949d1686e12b0030d96aa1af3c60f",
+ "generated_by": "python -m learned_opponents.export.game_data"
+}

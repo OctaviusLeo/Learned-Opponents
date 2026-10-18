@@ -43,6 +43,22 @@ line runs an import check that printed `ok 2.14.1+cu130 True` (torch version,
 
 CI installs only `requirements-ci.txt` (no CUDA wheels) on Python 3.12.
 
+## Unreal toolchain (Windows)
+
+| Item | Version | Verifiable artifact |
+| --- | --- | --- |
+| Unreal Engine | 5.8.3 (changelist 58210709, `++UE5+Release-5.8`), installed at `C:\Program Files (x86)\UE_5.8` | `Engine\Build\Build.version`; Epic launcher `LauncherInstalled.dat` (`AppVersion 5.8.3-58210709`) |
+| Visual Studio | Community 2026, 18.11.12306.390 | `vswhere -all -products *` |
+| MSVC toolchain | 14.51.36231 (compiler 14.51.36260; UBT warns it is newer than its preferred 14.50.35717) | `runs\logs\build_game.log`, "Using Visual Studio 14.51.36260 toolchain" |
+| Windows SDK | 10.0.28000.0 | same build log line |
+| NNE runtime | `NNERuntimeORTCpu` from the NNERuntimeORT plugin (marked Beta), which bundles ONNX Runtime 1.24 (`onnxruntime.dll` file version 1.24.20260304.11.3a728b7) | plugin `Binaries\ThirdParty\Onnxruntime\Win64\onnxruntime.dll` version info; the passing `LearnedOpponents.Inference.ParityAllModels` test (below) |
+
+The editor target builds with `scripts\build_game.ps1` (zero errors; the only warnings are engine-header
+C4996 deprecations). `scripts\run_ue_tests.ps1` runs the `LearnedOpponents.*` automation tests
+headless; the first run passed all five non-inference tests, and
+`LearnedOpponents.Obs.EngineAgnosticFixtures` measured a worst |C++ - Python| of 0 over the 128
+fixture cases (tolerance 1e-5).
+
 ## GPU settings for JAX (MJX)
 
 - `JAX_DEFAULT_MATMUL_PRECISION=highest`: required on Ampere (RTX 30-series)

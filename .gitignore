@@ -54,3 +54,7 @@ desktop.ini
 *~
 .idea/
 .vscode/
+
+# Editor-created per-user content folders
+game/LearnedOpponents/Content/Developers/
+game/LearnedOpponents/Content/Collections/

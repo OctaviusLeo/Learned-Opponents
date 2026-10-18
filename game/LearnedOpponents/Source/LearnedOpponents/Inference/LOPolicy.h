@@ -7,9 +7,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NNEModelData.h"   // complete type: TStrongObjectPtr is built wherever FLOPolicy is copied
 #include "UObject/StrongObjectPtr.h"
-
-class UNNEModelData;
 
 namespace UE::NNE
 {
