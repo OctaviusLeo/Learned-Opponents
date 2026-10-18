@@ -40,10 +40,13 @@ def repo_commit() -> str:
     return out.strip() if out else "unknown"
 
 
+def filter_dirty(porcelain: str) -> list[str]:
+    """Paths from ``git status --porcelain`` output that lie outside the generated directories."""
+    paths = [line[3:] for line in porcelain.splitlines() if line.strip()]
+    return [p for p in paths if not p.startswith(ALLOWED_DIRTY)]
+
+
 def dirty_paths() -> list[str] | None:
     """Changed paths outside the generated directories, or None if Git is unavailable."""
     out = _git("status", "--porcelain")
-    if out is None:
-        return None
-    paths = [line[3:] for line in out.splitlines() if line.strip()]
-    return [p for p in paths if not p.startswith(ALLOWED_DIRTY)]
+    return None if out is None else filter_dirty(out)
