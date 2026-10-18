@@ -208,10 +208,10 @@ flowchart TD
     - Demo/verify: `scripts/run_ue_tests.ps1` exits 0.
     - _Properties: 3 — Requirements: 2.4, 8.4, 8.5, 10.3_
 
-- [ ] 16. Run in-engine inference and build the race level
+- [x] 16. Run in-engine inference and build the race level
   - [x] 16.1 Implement `Inference/` with NNE as design.md describes (runtime `NNERuntimeORTCpu`, model data created at runtime from `results/models/*.onnx` with `UNNEModelData::Init`). Add an Automation test that runs each exported model in-engine on its parity observations and requires the actions to match the saved Python actions within 1e-4. Record the runtime used, its version, and that passing test as the verifiable artifact in `docs/ENVIRONMENT.md`. If NNE cannot load or run the models, follow the design's fallback order (ONNX Runtime linked directly into the Unreal module, then Godot) and record the blocker (_Requirements: 8.2, 8.3, 8.6_).
     - Demo/verify: the in-engine inference test passes for all six models.
-  - [ ] 16.2 Build `/Game/Maps/RaceLevel`: the player drives one robot (keyboard), the policy-driven robot races to checkpoints through obstacles, both with kinematic differential-drive motion from `config/task.yaml`; levels use engine basic shapes only and are created without the editor UI. Add `scripts/capture_gif.ps1` as design.md describes and write `docs/media/gameplay.gif` (_Requirements: 8.1, 8.2_).
+  - [x] 16.2 Build `/Game/Maps/RaceLevel`: the player drives one robot (keyboard), the policy-driven robot races to checkpoints through obstacles, both with kinematic differential-drive motion from `config/task.yaml`; levels use engine basic shapes only and are created without the editor UI. Add `scripts/capture_gif.ps1` as design.md describes and write `docs/media/gameplay.gif` (_Requirements: 8.1, 8.2_).
     - Demo/verify: a short `-game` launch on this desktop shows the opponent moving under ONNX inference and reaching checkpoints; `docs/media/gameplay.gif` exists and is under 10 MB.
     - _Requirements: 8.1, 8.2_
 

@@ -4,7 +4,8 @@
 //
 // Command line: -LOModel=<path.onnx> (default results/models/randomized_seed0.onnx),
 // -LOCourse=<path.json> (default results/game/race_course.json), -LODemoPlayer (a scripted
-// controller drives the player robot, for the README GIF), -LOQuitAfter=<seconds>.
+// controller drives the player robot, for the README GIF), -LOQuitAfter=<seconds>, and
+// -LOCaptureDir=<dir> [-LOCaptureStart=3 -LOCaptureSeconds=10 -LOCaptureFps=15] to save viewport frames.
 
 #pragma once
 
@@ -66,6 +67,11 @@ private:
 	double Accumulator = 0.0;
 	double RaceTime = 0.0;
 	double QuitAfter = -1.0;
+	FString CaptureDir;
+	double CaptureStart = 3.0;
+	double CaptureSeconds = 10.0;
+	double CaptureFps = 15.0;
+	int32 CaptureIndex = 0;
 	bool bDemoPlayer = false;
 	bool bReady = false;
 };

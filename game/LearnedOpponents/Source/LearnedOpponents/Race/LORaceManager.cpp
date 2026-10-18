@@ -19,6 +19,7 @@
 #include "Obs/LOObsSpec.h"
 #include "Race/LOArena.h"
 #include "Race/LORobot.h"
+#include "UnrealClient.h"
 
 ALORaceManager::ALORaceManager()
 {
@@ -91,24 +92,23 @@ void ALORaceManager::BeginPlay()
 		M->GetStaticMeshComponent()->SetStaticMesh(Disc);
 		M->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		M->GetStaticMeshComponent()->SetMaterial(0, ALOArena::ColorMaterial(M, FLinearColor(0.95f, 0.80f, 0.10f)));
+		M->SetActorEnableCollision(false);   // markers are visual only; robots must drive over them
 		M->SetActorLocation(LOObs::SpecToUnrealLocation(C.X, C.Y, 1.0));
 		const double D = 2.0 * Task.ArrivalToleranceM;
 		M->SetActorScale3D(FVector(D, D, 0.02));
 		Markers.Add(M);
 	}
 
-	// Key light with shadows plus a weak shadowless fill from the opposite side.
-	const FRotator LightDirs[2] = {FRotator(-60.0, 35.0, 0.0), FRotator(-45.0, 215.0, 0.0)};
-	for (int32 I = 0; I < 2; ++I)
+	// One shadow-casting key light (a second directional light makes the engine pick one and warn).
+	if (ADirectionalLight* Light = World->SpawnActor<ADirectionalLight>(FVector(0, 0, 1000), FRotator(-65.0, 35.0, 0.0)))
 	{
-		if (ADirectionalLight* Light = World->SpawnActor<ADirectionalLight>(FVector(0, 0, 1000), LightDirs[I]))
-		{
-			ULightComponent* LC = Light->GetLightComponent();
-			LC->SetMobility(EComponentMobility::Movable);
-			LC->SetIntensity(I == 0 ? 6.0f : 2.0f);
-			LC->SetCastShadows(I == 0);
-		}
+		Light->GetLightComponent()->SetMobility(EComponentMobility::Movable);
 	}
+
+	CaptureDir = LOData::CmdValue(TEXT("LOCaptureDir"), TEXT(""));
+	CaptureStart = FCString::Atod(*LOData::CmdValue(TEXT("LOCaptureStart"), TEXT("3")));
+	CaptureSeconds = FCString::Atod(*LOData::CmdValue(TEXT("LOCaptureSeconds"), TEXT("10")));
+	CaptureFps = FCString::Atod(*LOData::CmdValue(TEXT("LOCaptureFps"), TEXT("15")));
 	// Top-down camera: 70 degrees horizontal FOV from 11 m shows the 8 m arena on a 16:9 screen.
 	ACameraActor* Camera = World->SpawnActor<ACameraActor>(FVector(0, 0, 1100), FRotator(-90.0, 0.0, 0.0));
 	if (Camera)
@@ -118,6 +118,7 @@ void ALORaceManager::BeginPlay()
 	if (APlayerController* PC = World->GetFirstPlayerController(); PC && Camera)
 	{
 		PC->SetViewTarget(Camera);
+		PC->ConsoleCommand(TEXT("DisableAllScreenMessages"));
 	}
 	bReady = true;
 	UE_LOG(LogLearnedOpponents, Display, TEXT("race ready: model %s via %s, %d checkpoints, demo player %d"),
@@ -131,14 +132,24 @@ void ALORaceManager::Tick(float DeltaSeconds)
 	{
 		return;
 	}
-	RaceTime += DeltaSeconds;
-	Accumulator += DeltaSeconds;
+	// While capturing frames, race time advances exactly one capture interval per rendered frame,
+	// so the recording is time-correct even when saving screenshots slows the frame rate.
+	const double Dt = CaptureDir.IsEmpty() ? DeltaSeconds : 1.0 / CaptureFps;
+	RaceTime += Dt;
+	Accumulator += Dt;
 	int32 Steps = 0;
 	while (Accumulator >= Task.ControlDtS && Steps < 10)   // fixed step; cap catch-up after a hitch
 	{
 		ControlStep();
 		Accumulator -= Task.ControlDtS;
 		++Steps;
+	}
+	// README GIF: save the viewport (with the HUD) at CaptureFps during [CaptureStart, +CaptureSeconds).
+	if (!CaptureDir.IsEmpty() && RaceTime >= CaptureStart && CaptureIndex < FMath::RoundToInt(CaptureSeconds * CaptureFps))
+	{
+		FScreenshotRequest::RequestScreenshot(FPaths::Combine(CaptureDir, FString::Printf(TEXT("frame_%04d.png"), CaptureIndex)),
+			true, false);
+		++CaptureIndex;
 	}
 	if (QuitAfter > 0.0 && RaceTime >= QuitAfter)
 	{
@@ -173,12 +184,17 @@ void ALORaceManager::Advance(FLORacer& Racer, bool bCollided)
 	if (bCollided)
 	{
 		++Racer.Crashes;
+		UE_LOG(LogLearnedOpponents, Display, TEXT("race: %s crashed at (%.2f, %.2f) yaw %.2f heading to checkpoint %d (t=%.2f s)"),
+			&Racer == &Opponent ? TEXT("opponent") : TEXT("player"), Racer.Robot->X(), Racer.Robot->Y(), Racer.Robot->Yaw(),
+			Racer.NextCheckpoint, RaceTime);
 		Respawn(Racer);
 		return;
 	}
 	const FVector2D G = Checkpoint(Racer.NextCheckpoint);
 	if (FVector2D::Distance(FVector2D(Racer.Robot->X(), Racer.Robot->Y()), G) <= Task.ArrivalToleranceM)
 	{
+		UE_LOG(LogLearnedOpponents, Display, TEXT("race: %s reached checkpoint %d (t=%.2f s)"),
+			&Racer == &Opponent ? TEXT("opponent") : TEXT("player"), Racer.NextCheckpoint, RaceTime);
 		++Racer.NextCheckpoint;
 		if (Racer.NextCheckpoint % Checkpoints.Num() == 0)
 		{
