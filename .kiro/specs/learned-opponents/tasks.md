@@ -144,14 +144,14 @@ flowchart TD
     - Freeze and commit `config/train.yaml`, `config/task.yaml`, and `config/domain_rand.yaml`; no later task may change them.
     - _Requirements: 4.1, 4.5, 0.3_
 
-- [ ] 9. Evaluate the baseline at nominal parameters
+- [x] 9. Evaluate the baseline at nominal parameters
   - [x] 9.1 Implement `eval/metrics.py` (success/collision rates with 95% Wilson CIs; mean time-to-goal with a t CI) and a nominal-evaluation entry point `python -m learned_opponents.eval.robustness --nominal` that evaluates deterministic actions with a fixed evaluation seed over `eval_episodes_per_seed` episodes per seed and reports the pooled and per-seed Success_Rate with 95% CIs against `nominal_success_target` (_Requirements: 5.1, 5.2, 5.3, 0.4_).
     - `metrics.py` imports only numpy and the standard library.
   - [x] 9.2 Write Hypothesis property tests for the confidence intervals
     - **Property 9: Success/collision confidence intervals are valid proportions** (≥100 iterations).
     - **Property 10: Achieved time-to-goal CI brackets the mean** (≥100 iterations).
     - _Properties: 9, 10 — Requirements: 5.2, 6.2_
-  - [ ] 9.3 Train the reported baseline seeds and evaluate them at nominal
+  - [x] 9.3 Train the reported baseline seeds and evaluate them at nominal
     - Train baseline seeds 0, 1, 2 one after another with `scripts/train.sh`, polling each to completion. Run the nominal evaluation and write the result, with command, seeds, and commit, to `results/summary.md`. If the target is missed, report the real value and cause; do not loosen anything (_Requirements: 4.3, 5.2, 5.3, 0.4_).
     - _Requirements: 4.3, 4.4, 5.2, 5.3, 0.1, 0.4_
 

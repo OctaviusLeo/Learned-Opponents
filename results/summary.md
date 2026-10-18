@@ -5,6 +5,40 @@ hand. Rates are Success_Rate / Collision_Rate with 95% Wilson intervals; Time_To
 successful episodes with a 95% Student-t interval. Episodes are pooled across the 3 training seeds per
 variant; the pooled interval covers episode sampling only, so each seed's own rate is listed too.
 
+## Nominal evaluation: baseline
+
+- Command: `python -m learned_opponents.eval.robustness --nominal --variants baseline randomized --repeats 2`
+- Commit: `cd46c553551e1fa2caba498bbd2e5b56a2ffe9fb`
+- Training seeds: 0, 1, 2; training commits: seed 0 `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f`, seed 1 `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f`, seed 2 `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f`
+- Evaluation seed 20261017, 1024 episodes per training seed, deterministic actions, nominal domain parameters
+
+| Seed | Episodes | Success_Rate [95% CI] | Collision_Rate [95% CI] | Timeouts | Mean Time_To_Goal [95% CI] |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 1024 | 0.974 [0.962, 0.982] | 0.006 [0.003, 0.013] | 21 | 5.06 [4.96, 5.17] s |
+| 1 | 1024 | 0.964 [0.951, 0.974] | 0.008 [0.004, 0.015] | 29 | 5.10 [4.99, 5.21] s |
+| 2 | 1024 | 0.982 [0.972, 0.989] | 0.005 [0.002, 0.011] | 13 | 5.11 [5.00, 5.22] s |
+| pooled | 3072 | 0.973 [0.967, 0.978] | 0.006 [0.004, 0.010] | 63 | 5.09 [5.03, 5.15] s |
+
+Target `nominal_success_target` = 0.80: pooled Success_Rate 0.973 -> **met**.
+Evaluation reproducibility: each checkpoint was evaluated 3 times on the same evaluation seed (the table shows the first). Success counts per repeat: seed 0: [997, 997, 997]; seed 1: [987, 987, 988]; seed 2: [1006, 1008, 1006]. Measured evaluation tolerance (largest spread in a seed's Success_Rate): **0.0020**. Repeats are not bit-identical because MuJoCo Warp accumulates with floating-point atomics, so borderline episodes can flip.
+
+## Nominal evaluation: randomized
+
+- Command: `python -m learned_opponents.eval.robustness --nominal --variants baseline randomized --repeats 2`
+- Commit: `cd46c553551e1fa2caba498bbd2e5b56a2ffe9fb`
+- Training seeds: 0, 1, 2; training commits: seed 0 `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f`, seed 1 `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f`, seed 2 `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f`
+- Evaluation seed 20261017, 1024 episodes per training seed, deterministic actions, nominal domain parameters
+
+| Seed | Episodes | Success_Rate [95% CI] | Collision_Rate [95% CI] | Timeouts | Mean Time_To_Goal [95% CI] |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 1024 | 0.964 [0.951, 0.974] | 0.018 [0.011, 0.028] | 19 | 5.18 [5.07, 5.29] s |
+| 1 | 1024 | 0.934 [0.917, 0.947] | 0.032 [0.023, 0.045] | 35 | 5.17 [5.06, 5.28] s |
+| 2 | 1024 | 0.950 [0.935, 0.962] | 0.007 [0.003, 0.014] | 44 | 5.22 [5.10, 5.33] s |
+| pooled | 3072 | 0.949 [0.941, 0.956] | 0.019 [0.015, 0.024] | 98 | 5.19 [5.13, 5.26] s |
+
+Target `nominal_success_target` = 0.80: pooled Success_Rate 0.949 -> **met**.
+Evaluation reproducibility: each checkpoint was evaluated 3 times on the same evaluation seed (the table shows the first). Success counts per repeat: seed 0: [987, 986, 986]; seed 1: [956, 957, 956]; seed 2: [973, 972, 973]. Measured evaluation tolerance (largest spread in a seed's Success_Rate): **0.0010**. Repeats are not bit-identical because MuJoCo Warp accumulates with floating-point atomics, so borderline episodes can flip.
+
 ## Training budget selection (pilot, never reported as a result)
 
 - Command: `python -m learned_opponents.train.pilot curve` after `python -m learned_opponents.train --variant baseline --seed 100 --out runs/pilot/curve --force --set train.training_budget_steps=200000000 --checkpoint-every-steps 10000000`
