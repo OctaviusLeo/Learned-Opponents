@@ -54,7 +54,7 @@ def evaluate_grid(variants: Sequence[str], allow_dirty: bool) -> None:
         for ci, cell in enumerate(all_cells):
             results.append({"variant": variant, **asdict(cell), "seeds": per[ci]})
     wall = time.perf_counter() - t0
-    data = {"kind": "grid", "command": "python -m learned_opponents.eval.robustness " + " ".join(sys.argv[1:]),
+    data = {"kind": "grid", "command": " ".join(["python -m learned_opponents.eval.robustness", *sys.argv[1:]]),
             "commit": commit, "eval_seed": task["eval_seed"], "episodes_per_cell": n,
             "control_dt_s": task["control_dt_s"], "grid": grid,
             "training_ranges": {p: list(training_range(ranges, p)) for p in grid},

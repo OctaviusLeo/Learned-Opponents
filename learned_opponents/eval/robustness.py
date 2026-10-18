@@ -68,7 +68,7 @@ def evaluate_nominal(variants: Sequence[str], repeats: int, allow_dirty: bool) -
     params = nominal_params(ranges)
     layouts = eval_layouts(task, task["eval_seed"], n)
     env = make_eval_env(task, n)
-    command = "python -m learned_opponents.eval.robustness " + " ".join(sys.argv[1:])
+    command = " ".join(["python -m learned_opponents.eval.robustness", *sys.argv[1:]])
     written = []
     for variant in variants:
         seeds = list(train["seeds"][variant])
