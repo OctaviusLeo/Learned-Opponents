@@ -3,7 +3,7 @@
 # training_budget_steps and the PPO settings are chosen by the baseline pilot
 # (seed 100, never reported; task 8.3) and frozen before any reported run.
 
-training_budget_steps: 100000000   # environment (control) steps per run, all worlds summed
+training_budget_steps: 30081024    # 306 PPO iterations; chosen by the pilot rule (results/eval/pilot_curve.json), frozen in task 8.3
 num_parallel_envs: 4096            # >= the 4096 worlds proven in the M0 smoke test
 max_minutes_per_run: 60
 bank_size: 262144                  # pre-sampled episode layouts / domain parameters per run

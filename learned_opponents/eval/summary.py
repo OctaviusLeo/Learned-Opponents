@@ -107,9 +107,13 @@ def pilot_curve_section(r: Mapping[str, Any]) -> str:
              f"- Commit: `{r['commit']}` (pilot trained at `{r['train_commit']}`)",
              f"- Pilot seed {r['seed']}, baseline variant; each checkpoint evaluated at nominal parameters on "
              f"{r['episodes']} layouts from the pilot seed's evaluation stream (not the reported evaluation seed).",
-             f"- Rule: {r['rule']}", "",
+             f"- Rule {' '.join(r['rule'].split())}", "",
              "| Env steps | Wall time | Success_Rate [95% CI] | Collisions | Timeouts |", "| --- | --- | --- | --- | --- |"]
+    seen = set()
     for p in r["points"]:
+        if p["env_steps"] in seen:      # the final checkpoint is also saved as checkpoint.pt
+            continue
+        seen.add(p["env_steps"])
         lines.append(f"| {p['env_steps']:,} | {p['elapsed_min']:.1f} min | "
                      f"{M.fmt_rate(M.wilson(p['success'], p['n']))} | {p['collision']} | {p['timeout']} |")
     lines += ["", f"Chosen `training_budget_steps` = **{r['chosen_env_steps']:,}** (Success_Rate "

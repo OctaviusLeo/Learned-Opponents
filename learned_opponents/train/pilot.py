@@ -80,7 +80,10 @@ def curve() -> int:
     task = cfglib.load_task()
     train = cfglib.load_yaml("train.yaml")
     run_dir = PILOT / "curve"
-    cks = sorted((run_dir / "checkpoints").glob("iter*.pt")) + [run_dir / "checkpoint.pt"]
+    cks = sorted((run_dir / "checkpoints").glob("iter*.pt"))
+    final = json.loads((run_dir / "summary.json").read_text())["iterations"]
+    if not cks or not cks[-1].name.startswith(f"iter{final:05d}"):
+        cks.append(run_dir / "checkpoint.pt")      # the final weights, unless already a curve checkpoint
     points = _evaluate(run_dir, cks, task, PILOT_EPISODES)
     times = _elapsed_by_iteration(run_dir)
     for p in points:
