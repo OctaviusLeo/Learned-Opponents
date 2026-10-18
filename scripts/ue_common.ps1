@@ -19,6 +19,6 @@ function Wait-NoUnreal {
 
 function Test-GpuJobRunning {
     # A project GPU job (training / evaluation / export) running inside WSL.
-    $out = wsl -d Ubuntu-24.04 -- pgrep -f "learned_opponents\.(train|eval|export)" 2>$null
-    return [bool]$out
+    $out = wsl -d Ubuntu-24.04 -- bash -c "pgrep -f 'learned_opponents[.](train|eval|export)' > /dev/null && echo busy"
+    return ($out -eq "busy")
 }

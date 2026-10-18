@@ -12,6 +12,7 @@ environment for collision checks.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from typing import Any, Mapping
 
@@ -170,6 +171,7 @@ def layouts_from_json(episodes: list[Mapping[str, Any]], max_obstacles: int) -> 
 
 
 def save_layouts_json(path: str, layouts: Layouts, meta: Mapping[str, Any]) -> None:
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         json.dump({**meta, "episodes": layouts_to_json(layouts)}, f, indent=1)
         f.write("\n")
