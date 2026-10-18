@@ -232,7 +232,7 @@ flowchart TD
     - If a target is missed, report the real value and cause; do not loosen any target or test (_Requirements: 11.4, 0.4_).
     - Demo/verify: every number in the README matches `results/summary.md` and has its command, seed, and commit beside it.
 
-- [ ] 19. **Automated checkpoint — end-to-end gate:** confirm train → robustness → ONNX export → parity → in-engine play → transfer check with the repository commands: the full `pytest` in WSL, `scripts/run_ue_tests.ps1`, the parity command on all six models, a green CI run on the latest pushed commit, and a script check that `results/summary.md` holds the nominal, robustness, and transfer sections, that `docs/media/gameplay.gif` exists, and that the README numbers match the summary. The checkpoint passes when all exit 0. The agent fixes failures and re-runs within the retry cap; it does not pause for input (_Requirements: 11.4, 0.1, 0.4_).
+- [x] 19. **Automated checkpoint — end-to-end gate:** confirm train → robustness → ONNX export → parity → in-engine play → transfer check with the repository commands: the full `pytest` in WSL, `scripts/run_ue_tests.ps1`, the parity command on all six models, a green CI run on the latest pushed commit, and a script check that `results/summary.md` holds the nominal, robustness, and transfer sections, that `docs/media/gameplay.gif` exists, and that the README numbers match the summary. The checkpoint passes when all exit 0. The agent fixes failures and re-runs within the retry cap; it does not pause for input (_Requirements: 11.4, 0.1, 0.4_).
 
 ## Notes
 

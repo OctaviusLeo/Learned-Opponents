@@ -1,0 +1,40 @@
+== full pytest (WSL)
+=============================== warnings summary ===============================
+113 passed, 3 warnings in 62.13s (0:01:02)
+PASS  full pytest (WSL)
+== Unreal automation tests
+tests: 6 passed, 0 failed, 0 not run
+PASS  Unreal automation tests
+== parity, six models
+PASS baseline_seed0 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 2.503e-06 at observation 635 (tolerance 1e-04)
+PASS baseline_seed0 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 2.503e-06 at observation 635 (tolerance 1e-04)
+PASS baseline_seed1 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 2.384e-06 at observation 779 (tolerance 1e-04)
+PASS baseline_seed1 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 2.384e-06 at observation 779 (tolerance 1e-04)
+PASS baseline_seed2 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 3.994e-06 at observation 684 (tolerance 1e-04)
+PASS baseline_seed2 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 3.994e-06 at observation 684 (tolerance 1e-04)
+PASS randomized_seed0 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 2.146e-06 at observation 916 (tolerance 1e-04)
+PASS randomized_seed0 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 2.146e-06 at observation 916 (tolerance 1e-04)
+PASS randomized_seed1 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 1.192e-06 at observation 955 (tolerance 1e-04)
+PASS randomized_seed1 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 1.192e-06 at observation 955 (tolerance 1e-04)
+PASS randomized_seed2 (saved Python actions vs ONNX Runtime): 1000 observations, max |action diff| 2.027e-06 at observation 738 (tolerance 1e-04)
+PASS randomized_seed2 (Python policy vs ONNX Runtime): 1000 observations, max |action diff| 2.027e-06 at observation 738 (tolerance 1e-04)
+parity: PASS (6 models, tolerance 1e-04)
+PASS  parity, six models
+== summary sections
+PASS  summary sections
+== gameplay GIF
+PASS  gameplay GIF
+== README matches summary.md
+README blocks match results/summary.md
+PASS  README matches summary.md
+== CI green on the latest pushed commit
+HEAD ef9a9f8a3a589f9e25e6bde710992d5f2fa049f7, origin/master ef9a9f8a3a589f9e25e6bde710992d5f2fa049f7, run: completed success
+PASS  CI green on the latest pushed commit
+PASS  full pytest (WSL)
+PASS  Unreal automation tests
+PASS  parity, six models
+PASS  summary sections
+PASS  gameplay GIF
+PASS  README matches summary.md
+PASS  CI green on the latest pushed commit
+end-to-end gate: PASS
