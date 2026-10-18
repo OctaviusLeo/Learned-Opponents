@@ -181,10 +181,10 @@ flowchart TD
 
 ### M4 — ONNX export and parity
 
-- [ ] 13. Export the policy to ONNX and save parity fixtures
-  - [ ] 13.1 Implement `export/to_onnx.py` as a single command exporting a checkpoint's whole deterministic policy (normalization, MLP, action head) to an ONNX_Model with input `obs` `float32[1, N_rays + 5]` and output `action` `float32[1, 2]` (conforming to the Obs_Action_Spec); export all six checkpoints to `results/models/<variant>_seed<seed>.onnx`; save the parity fixtures described in design.md to `results/parity/<variant>_seed<seed>/` (_Requirements: 7.1, 7.2, 7.6_).
+- [x] 13. Export the policy to ONNX and save parity fixtures
+  - [x] 13.1 Implement `export/to_onnx.py` as a single command exporting a checkpoint's whole deterministic policy (normalization, MLP, action head) to an ONNX_Model with input `obs` `float32[1, N_rays + 5]` and output `action` `float32[1, 2]` (conforming to the Obs_Action_Spec); export all six checkpoints to `results/models/<variant>_seed<seed>.onnx`; save the parity fixtures described in design.md to `results/parity/<variant>_seed<seed>/` (_Requirements: 7.1, 7.2, 7.6_).
     - Demo/verify: the command writes the `.onnx` files and the fixtures; loading each model reports the expected input/output names and shapes.
-  - [ ] 13.2 Write an example test for ONNX I/O shape conformance
+  - [x] 13.2 Write an example test for ONNX I/O shape conformance
     - Confirm each exported model's input/output names and shapes match the Obs_Action_Spec (single execution; runs in CI).
     - _Requirements: 7.6_
 

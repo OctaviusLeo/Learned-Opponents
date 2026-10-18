@@ -1,0 +1,108 @@
+{
+ "command": "python -m learned_opponents.export.to_onnx --all",
+ "commit": "ae3f9c7e40dfe14d636527c851832f6190f68da5",
+ "models": {
+  "baseline_seed0": {
+   "path": "results/models/baseline_seed0.onnx",
+   "obs_dim": 29,
+   "opset": 17,
+   "ir_version": 8,
+   "variant": "baseline",
+   "seed": "0",
+   "train_commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "export_commit": "ae3f9c7e40dfe14d636527c851832f6190f68da5",
+   "obs_layout": "rays[n_rays]/max_range, goal_dir_x, goal_dir_y, goal_distance, vel_linear, vel_angular (learned_opponents/spec/spec.md)",
+   "action_layout": "wheel_left, wheel_right in [-1, 1] (x max_wheel_speed rad/s)",
+   "fixtures": {
+    "observations": 1000,
+    "from_rollouts": 500,
+    "uniform": 500
+   }
+  },
+  "baseline_seed1": {
+   "path": "results/models/baseline_seed1.onnx",
+   "obs_dim": 29,
+   "opset": 17,
+   "ir_version": 8,
+   "variant": "baseline",
+   "seed": "1",
+   "train_commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "export_commit": "ae3f9c7e40dfe14d636527c851832f6190f68da5",
+   "obs_layout": "rays[n_rays]/max_range, goal_dir_x, goal_dir_y, goal_distance, vel_linear, vel_angular (learned_opponents/spec/spec.md)",
+   "action_layout": "wheel_left, wheel_right in [-1, 1] (x max_wheel_speed rad/s)",
+   "fixtures": {
+    "observations": 1000,
+    "from_rollouts": 500,
+    "uniform": 500
+   }
+  },
+  "baseline_seed2": {
+   "path": "results/models/baseline_seed2.onnx",
+   "obs_dim": 29,
+   "opset": 17,
+   "ir_version": 8,
+   "variant": "baseline",
+   "seed": "2",
+   "train_commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "export_commit": "ae3f9c7e40dfe14d636527c851832f6190f68da5",
+   "obs_layout": "rays[n_rays]/max_range, goal_dir_x, goal_dir_y, goal_distance, vel_linear, vel_angular (learned_opponents/spec/spec.md)",
+   "action_layout": "wheel_left, wheel_right in [-1, 1] (x max_wheel_speed rad/s)",
+   "fixtures": {
+    "observations": 1000,
+    "from_rollouts": 500,
+    "uniform": 500
+   }
+  },
+  "randomized_seed0": {
+   "path": "results/models/randomized_seed0.onnx",
+   "obs_dim": 29,
+   "opset": 17,
+   "ir_version": 8,
+   "variant": "randomized",
+   "seed": "0",
+   "train_commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "export_commit": "ae3f9c7e40dfe14d636527c851832f6190f68da5",
+   "obs_layout": "rays[n_rays]/max_range, goal_dir_x, goal_dir_y, goal_distance, vel_linear, vel_angular (learned_opponents/spec/spec.md)",
+   "action_layout": "wheel_left, wheel_right in [-1, 1] (x max_wheel_speed rad/s)",
+   "fixtures": {
+    "observations": 1000,
+    "from_rollouts": 500,
+    "uniform": 500
+   }
+  },
+  "randomized_seed1": {
+   "path": "results/models/randomized_seed1.onnx",
+   "obs_dim": 29,
+   "opset": 17,
+   "ir_version": 8,
+   "variant": "randomized",
+   "seed": "1",
+   "train_commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "export_commit": "ae3f9c7e40dfe14d636527c851832f6190f68da5",
+   "obs_layout": "rays[n_rays]/max_range, goal_dir_x, goal_dir_y, goal_distance, vel_linear, vel_angular (learned_opponents/spec/spec.md)",
+   "action_layout": "wheel_left, wheel_right in [-1, 1] (x max_wheel_speed rad/s)",
+   "fixtures": {
+    "observations": 1000,
+    "from_rollouts": 500,
+    "uniform": 500
+   }
+  },
+  "randomized_seed2": {
+   "path": "results/models/randomized_seed2.onnx",
+   "obs_dim": 29,
+   "opset": 17,
+   "ir_version": 8,
+   "variant": "randomized",
+   "seed": "2",
+   "train_commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "export_commit": "ae3f9c7e40dfe14d636527c851832f6190f68da5",
+   "obs_layout": "rays[n_rays]/max_range, goal_dir_x, goal_dir_y, goal_distance, vel_linear, vel_angular (learned_opponents/spec/spec.md)",
+   "action_layout": "wheel_left, wheel_right in [-1, 1] (x max_wheel_speed rad/s)",
+   "fixtures": {
+    "observations": 1000,
+    "from_rollouts": 500,
+    "uniform": 500
+   }
+  }
+ }
+}

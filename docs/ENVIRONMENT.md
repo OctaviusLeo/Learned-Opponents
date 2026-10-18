@@ -43,6 +43,18 @@ line runs an import check that printed `ok 2.14.1+cu130 True` (torch version,
 
 CI installs only `requirements-ci.txt` (no CUDA wheels) on Python 3.12.
 
+## ONNX export
+
+- Exporter: `torch.onnx.export` (TorchScript exporter, `dynamo=False`) in torch 2.14.1, opset 17,
+  ONNX IR version 8, checked with `onnx.checker` from onnx 1.23.2; inference checked with
+  onnxruntime 1.31.0 (CPU execution provider).
+- Graph per model: `(obs - mean) / (std + 0.01)` -> 256x256 ELU MLP -> Beta mean
+  (`Softplus + 1` for alpha and beta, `alpha / (alpha + beta)` rescaled to [-1, 1]) -> clip.
+  Input `obs` float32[1, 29], output `action` float32[1, 2] (`tests/test_onnx_io.py`).
+- Verifiable artifact: `python -m learned_opponents.export.parity` passes on all six models (worst
+  max |action difference| 4.0e-6, tolerance 1e-4) and `--mismatch-demo` fails as intended;
+  output in `docs/evidence/parity.txt`.
+
 ## Unreal toolchain (Windows)
 
 | Item | Version | Verifiable artifact |
