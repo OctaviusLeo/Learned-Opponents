@@ -85,9 +85,27 @@ Earlier pilot evidence (stopped runs and why): `docs/evidence/pilot/README.md`, 
 
 Measured training reproducibility tolerance on this GPU (absolute difference in nominal Success_Rate between the two runs): **0.004**.
 
+## Training runs
+
+- Command: `python -m learned_opponents.eval.training_runs` (collects `runs/<variant>/seed<seed>/summary.json` written by `python -m learned_opponents.train`)
+- Commit: `c37b932fa1e7f4a44f820caad00e11753fc8cc3c`
+- Wall time covers the whole run on one GPU: simulation, PPO updates, and logging.
+
+| Variant | Seed | Training commit | Iterations | Env steps | Wall time | Env steps/s |
+| --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 3.7 min | 134,711 |
+| baseline | 1 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 5.8 min | 87,040 |
+| baseline | 2 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 6.5 min | 76,894 |
+| randomized | 0 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 4.3 min | 115,386 |
+| randomized | 1 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 6.4 min | 78,051 |
+| randomized | 2 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 6.8 min | 73,458 |
+
+Wall time per run: 3.7 to 6.8 min over 6 runs.
+
 ## Robustness at a glance
 
 - Command: `python -m learned_opponents.eval.robustness `; commit `cb4144d8fab1d871d070eace89e18591aaed3b11`; evaluation seed 20261017; 1024 episodes per training seed per cell, pooled over 3 seeds per variant (full table with collision rates, times, and per-seed rates under "Robustness grid").
+- Latency is counted in control steps of 50 ms, and one value delays both the action and the observation queue; training draws each queue's delay separately from [0, 2] steps.
 
 | Parameter | Value | Range | Baseline Success_Rate [95% CI] | Randomized Success_Rate [95% CI] | Randomized - baseline |
 | --- | --- | --- | --- | --- | --- |
@@ -178,8 +196,9 @@ Plot: `results/robustness_latency_steps.png`
 - Commit: `9aed9521952e633b73c8b7c76e2a76aa190063da`
 - 50 layouts from `results/transfer/episodes.json` (layout seed 50505) x 3 training seeds per variant, nominal parameters, deterministic actions; the game runs headless and steps each episode at control_dt_s.
 - Transfer_Gap = MuJoCo Success_Rate - in-game Success_Rate on the same episodes, reported as measured (nothing tuned to shrink it).
+- The episodes are paired, so the gap equals (successes only in MuJoCo - successes only in the game) / episodes; the p-value is a two-sided exact McNemar test on those discordant episodes.
 
-| Variant | Episodes | MuJoCo Success_Rate [95% CI] | In-game Success_Rate [95% CI] | Transfer_Gap | In-game Collision_Rate [95% CI] |
-| --- | --- | --- | --- | --- | --- |
-| baseline | 150 | 0.993 [0.963, 0.999] | 0.980 [0.943, 0.993] | +0.013 | 0.013 [0.004, 0.047] |
-| randomized | 150 | 0.953 [0.907, 0.977] | 0.940 [0.890, 0.968] | +0.013 | 0.040 [0.018, 0.085] |
+| Variant | Episodes | MuJoCo Success_Rate [95% CI] | In-game Success_Rate [95% CI] | Transfer_Gap | Success only in MuJoCo / only in game | McNemar p | In-game Collision_Rate [95% CI] |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| baseline | 150 | 0.993 [0.963, 0.999] | 0.980 [0.943, 0.993] | +0.013 | 3 / 1 | 0.62 | 0.013 [0.004, 0.047] |
+| randomized | 150 | 0.953 [0.907, 0.977] | 0.940 [0.890, 0.968] | +0.013 | 3 / 1 | 0.62 | 0.040 [0.018, 0.085] |

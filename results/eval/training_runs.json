@@ -1,0 +1,61 @@
+{
+ "kind": "training_runs",
+ "command": "python -m learned_opponents.eval.training_runs",
+ "commit": "c37b932fa1e7f4a44f820caad00e11753fc8cc3c",
+ "runs": [
+  {
+   "variant": "baseline",
+   "seed": 0,
+   "commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "iterations": 306,
+   "env_steps": 30081024,
+   "wall_s": 223.3,
+   "stopped_early": false
+  },
+  {
+   "variant": "baseline",
+   "seed": 1,
+   "commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "iterations": 306,
+   "env_steps": 30081024,
+   "wall_s": 345.6,
+   "stopped_early": false
+  },
+  {
+   "variant": "baseline",
+   "seed": 2,
+   "commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "iterations": 306,
+   "env_steps": 30081024,
+   "wall_s": 391.2,
+   "stopped_early": false
+  },
+  {
+   "variant": "randomized",
+   "seed": 0,
+   "commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "iterations": 306,
+   "env_steps": 30081024,
+   "wall_s": 260.7,
+   "stopped_early": false
+  },
+  {
+   "variant": "randomized",
+   "seed": 1,
+   "commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "iterations": 306,
+   "env_steps": 30081024,
+   "wall_s": 385.4,
+   "stopped_early": false
+  },
+  {
+   "variant": "randomized",
+   "seed": 2,
+   "commit": "aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f",
+   "iterations": 306,
+   "env_steps": 30081024,
+   "wall_s": 409.5,
+   "stopped_early": false
+  }
+ ]
+}
