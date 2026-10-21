@@ -22,7 +22,6 @@ Demo (success, collision, timeout, each tagged with its reason):
 from __future__ import annotations
 
 import argparse
-import math
 from dataclasses import dataclass
 from typing import Any, Mapping
 

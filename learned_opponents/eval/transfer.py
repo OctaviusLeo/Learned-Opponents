@@ -17,7 +17,6 @@ import time
 
 from learned_opponents import config as cfglib
 from learned_opponents.env import obstacles as ob
-from learned_opponents.env import rules
 from learned_opponents.eval.robustness import EVAL_DIR, check_runs, provenance, run_dir, write_json
 from learned_opponents.randomization.domain_rand import make_rng
 

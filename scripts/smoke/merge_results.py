@@ -47,7 +47,7 @@ def markdown(result: dict, nvsmi_win: str, nvsmi_wsl: str) -> str:
         "",
         f"- Command: `{result['command']}`",
         f"- Commit: `{result['commit']}`; seed {result['seed']} (start poses and wheel commands)",
-        f"- Raw result: `results/smoke_result.json`; logs: `docs/evidence/smoke_*.log`",
+        "- Raw result: `results/smoke_result.json`; logs: `docs/evidence/smoke_*.log`",
         f"- Chosen framework: **{result['chosen_framework']}** ({result['selection_rule']})",
         "",
         "| Framework | Passed | First failing condition | Parallel envs | Steps measured | Env steps/s | "
