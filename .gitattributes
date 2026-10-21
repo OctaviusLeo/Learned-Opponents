@@ -12,6 +12,8 @@
 *.lock  text eol=lf
 *.log   text eol=lf
 *.csv   text eol=lf
+.gitignore     text eol=lf
+.gitattributes text eol=lf
 
 # PowerShell and Unreal C++ sources keep Windows line endings.
 *.ps1   text eol=crlf
