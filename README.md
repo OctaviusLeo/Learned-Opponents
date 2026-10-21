@@ -243,7 +243,8 @@ Measured training reproducibility tolerance on this GPU (absolute difference in 
 ### Without a GPU (a few minutes)
 
 Everything needed to check the committed results runs on the CPU with Python 3.12 (Linux, macOS, or
-Windows; on Windows activate with `.venv\Scripts\activate`):
+Windows; on Windows activate with `.venv\Scripts\activate`; on Debian or Ubuntu, `venv` needs the
+`python3.12-venv` package):
 
 ```bash
 git clone https://github.com/OctaviusLeo/Learned-Opponents.git
