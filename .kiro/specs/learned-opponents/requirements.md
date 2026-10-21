@@ -209,3 +209,5 @@ This document defines the requirements only. Framework choice (MuJoCo Playground
 ## Out of Scope
 
 The following are explicitly out of scope: legged locomotion, Isaac Sim, multiplayer, store releases, and photorealism. Publishing the Game or the repository is a separate step that waits for the owner's approval; the repository stays private with no public license, packaging, or releases until then.
+
+> **Owner decision, 2026-10-21:** the repository was released publicly under the MIT License.
