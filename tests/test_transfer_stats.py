@@ -57,3 +57,22 @@ def test_transfer_section_in_summary(tmp_path):
     (tmp_path / "transfer.json").write_text(json.dumps(data))
     text = summary.render(tmp_path)
     assert "## Transfer check" in text and "+0.500" in text and "c" * 40 in text
+    assert "| +0.500 | 3 / 0 | 0.25 |" in text            # 3 MuJoCo-only successes per variant; 2 * 0.5**3
+
+
+@settings(max_examples=200, deadline=None)
+@given(data=transfer_data())
+def test_discordant_counts_account_for_the_gap(data):
+    for row in T.transfer_rows(data):
+        assert row["mujoco_only"] - row["game_only"] == round(row["gap"] * row["n"])
+        assert row["mujoco_only"] + row["game_only"] <= row["n"]
+        assert 0.0 <= row["mcnemar_p"] <= 1.0
+        assert row["mcnemar_p"] == T.mcnemar_exact_p(row["game_only"], row["mujoco_only"])   # symmetric
+
+
+def test_mcnemar_exact_known_values():
+    assert T.mcnemar_exact_p(0, 0) == 1.0
+    assert T.mcnemar_exact_p(3, 3) == 1.0
+    assert T.mcnemar_exact_p(5, 0) == pytest.approx(2 / 32)            # 2 * 0.5**5
+    assert T.mcnemar_exact_p(2, 0) == pytest.approx(0.5)               # 2 * 0.5**2
+    assert T.mcnemar_exact_p(10, 2) == pytest.approx(2 * 79 / 4096)    # 2 * P(X <= 2), X ~ Bin(12, 0.5)

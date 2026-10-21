@@ -84,9 +84,18 @@ def glance_section(eval_dir: Path) -> str:
     lines = ["## Robustness at a glance", "",
              f"- Command: `{data['command']}`; commit `{data['commit']}`; evaluation seed {data['eval_seed']}; "
              f"{data['episodes_per_cell']} episodes per training seed per cell, pooled over 3 seeds per variant "
-             "(full table with collision rates, times, and per-seed rates under \"Robustness grid\").", "",
-             "| Parameter | Value | Range | Baseline Success_Rate [95% CI] | Randomized Success_Rate [95% CI] | "
-             "Randomized - baseline |", "| --- | --- | --- | --- | --- | --- |"]
+             "(full table with collision rates, times, and per-seed rates under \"Robustness grid\")."]
+    if "latency_steps" in data["grid"]:
+        note = (f"- Latency is counted in control steps of {float(data['control_dt_s']) * 1000:g} ms, and one "
+                "value delays both the action and the observation queue")
+        lat_range = data.get("training_ranges", {}).get("latency_steps")
+        if lat_range:
+            note += (f"; training draws each queue's delay separately from [{lat_range[0]:g}, {lat_range[1]:g}] "
+                     "steps")
+        lines.append(note + ".")
+    lines += ["",
+              "| Parameter | Value | Range | Baseline Success_Rate [95% CI] | Randomized Success_Rate [95% CI] | "
+              "Randomized - baseline |", "| --- | --- | --- | --- | --- | --- |"]
     for param, values in data["grid"].items():
         for v in values:
             b, r = rows.get(("baseline", param, v)), rows.get(("randomized", param, v))
@@ -110,13 +119,37 @@ def transfer_section(eval_dir: Path) -> str:
              f"{data['layout_seed']}) x {len(data['seeds'])} training seeds per variant, nominal parameters, "
              "deterministic actions; the game runs headless and steps each episode at control_dt_s.",
              "- Transfer_Gap = MuJoCo Success_Rate - in-game Success_Rate on the same episodes, reported as "
-             "measured (nothing tuned to shrink it).", "",
+             "measured (nothing tuned to shrink it).",
+             "- The episodes are paired, so the gap equals (successes only in MuJoCo - successes only in the "
+             "game) / episodes; the p-value is a two-sided exact McNemar test on those discordant episodes.", "",
              "| Variant | Episodes | MuJoCo Success_Rate [95% CI] | In-game Success_Rate [95% CI] | "
-             "Transfer_Gap | In-game Collision_Rate [95% CI] |", "| --- | --- | --- | --- | --- | --- |"]
+             "Transfer_Gap | Success only in MuJoCo / only in game | McNemar p | In-game Collision_Rate [95% CI] |",
+             "| --- | --- | --- | --- | --- | --- | --- | --- |"]
     for r in transfer_rows(data):
         lines.append(f"| {r['variant']} | {r['n']} | {M.fmt_rate(r['mujoco'])} | {M.fmt_rate(r['game'])} | "
-                     f"{r['gap']:+.3f} | {M.fmt_rate(r['game_collision'])} |")
+                     f"{r['gap']:+.3f} | {r['mujoco_only']} / {r['game_only']} | {r['mcnemar_p']:.2f} | "
+                     f"{M.fmt_rate(r['game_collision'])} |")
     return "\n".join(lines) + "\n"
 
 
-SECTIONS = [glance_section, grid_section, transfer_section]
+def training_runs_section(eval_dir: Path) -> str:
+    """Environment steps and wall time of each reported training run (whole run, PPO updates included)."""
+    data = _load(eval_dir, "training_runs.json")
+    if not data:
+        return ""
+    runs = data["runs"]
+    lines = ["## Training runs", "",
+             f"- Command: `{data['command']}` (collects `runs/<variant>/seed<seed>/summary.json` written by "
+             "`python -m learned_opponents.train`)", f"- Commit: `{data['commit']}`",
+             "- Wall time covers the whole run on one GPU: simulation, PPO updates, and logging.", "",
+             "| Variant | Seed | Training commit | Iterations | Env steps | Wall time | Env steps/s |",
+             "| --- | --- | --- | --- | --- | --- | --- |"]
+    for r in runs:
+        lines.append(f"| {r['variant']} | {r['seed']} | `{r['commit']}` | {r['iterations']} | {r['env_steps']:,} | "
+                     f"{r['wall_s'] / 60:.1f} min | {r['env_steps'] / r['wall_s']:,.0f} |")
+    walls = [r["wall_s"] / 60 for r in runs]
+    lines += ["", f"Wall time per run: {min(walls):.1f} to {max(walls):.1f} min over {len(runs)} runs."]
+    return "\n".join(lines) + "\n"
+
+
+SECTIONS = [training_runs_section, glance_section, grid_section, transfer_section]

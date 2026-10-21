@@ -138,3 +138,18 @@ def test_glance_section_compares_variants(tmp_path):
     # Out-of-range cells: baseline 800/1000, randomized 860/1000 per seed -> +0.060.
     assert "| Mass scale | 2 | out | 0.800" in text and "+0.060 |" in text
     assert text.count("\n| ") == 2 + 17          # header, rule, one row per cell
+    assert "control steps of 50 ms" in text and "separately from [0, 2] steps" in text
+
+
+def test_training_runs_section(tmp_path):
+    runs = [{"variant": v, "seed": s, "commit": "t" * 40, "iterations": 306, "env_steps": 30081024,
+             "wall_s": w, "stopped_early": False}
+            for (v, s), w in zip([("baseline", 0), ("randomized", 0)], [240.0, 360.0])]
+    data = {"kind": "training_runs", "command": "python -m learned_opponents.eval.training_runs",
+            "commit": "c" * 40, "runs": runs}
+    (tmp_path / "training_runs.json").write_text(json.dumps(data))
+    text = summary_sections.training_runs_section(tmp_path)
+    assert text.startswith("## Training runs") and "c" * 40 in text
+    assert "| baseline | 0 | `" + "t" * 40 + "` | 306 | 30,081,024 | 4.0 min | 125,338 |" in text
+    assert "Wall time per run: 4.0 to 6.0 min over 2 runs." in text
+    assert summary_sections.training_runs_section(tmp_path / "missing") == ""
