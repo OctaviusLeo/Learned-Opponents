@@ -21,6 +21,7 @@ dist/
 .eggs/
 .mypy_cache/
 .ruff_cache/
+.venv/
 
 # === Generated heavy artifacts ===
 # Ignore everything under runs/ except the tracked placeholder.

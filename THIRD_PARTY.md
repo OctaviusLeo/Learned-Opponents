@@ -46,3 +46,15 @@ and `docs/evidence/freeze_lo-mjlab.txt`.
 | --- | --- | --- |
 | Unreal Engine (incl. NNE / NNERuntimeORT plugins) | 5.8.3 | Unreal Engine EULA (proprietary; engine content is not redistributed here) |
 | FFmpeg (GIF capture only, not distributed) | see `docs/ENVIRONMENT.md` | LGPL-2.1-or-later / GPL (build-dependent) |
+
+## Binary files committed in this repository
+
+All are produced by this project's own scripts; none contains third-party content.
+
+| Files | Produced by |
+| --- | --- |
+| `results/models/*.onnx` | `python -m learned_opponents.export.to_onnx --all` (this project's trained policies) |
+| `results/parity/*/*.npy` | the same export command (parity observations and actions) |
+| `results/robustness_*.png` | `python -m learned_opponents.eval.robustness` (matplotlib plots) |
+| `game/LearnedOpponents/Content/Maps/*.umap` | `scripts/create_maps.ps1` (empty maps; the level is built from C++ at run time, and no engine or marketplace assets are saved in them) |
+| `docs/media/gameplay.gif` | `scripts/capture_gif.ps1` (a screen capture of this game) |
