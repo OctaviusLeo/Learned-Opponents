@@ -7,7 +7,7 @@ The robot learns to reach goals among obstacles with PPO in 4096 parallel MuJoCo
 variants: a **baseline** trained at fixed physical parameters and a **domain-randomized** variant, 3
 training seeds each. Both are evaluated on a robustness grid of perturbed mass, wheel friction, and
 latency, exported to ONNX, and run inside an Unreal Engine 5.8 racing game as the opponent, where an
-automated transfer check measures the sim-to-sim gap.
+automated transfer check measures the sim-to-sim gap (MuJoCo to Unreal, not real hardware).
 
 **Why it matters.** A policy that only works at the parameters it was trained on fails when the real
 system is heavier, slipperier, or slower to respond than the simulator. The research question: how much
@@ -23,26 +23,30 @@ reproducible; in play it is driven with W/A/S/D. Recorded by `scripts/capture_gi
 
 ## Results at a glance
 
-Success_Rate is the fraction of episodes that reach the goal; brackets are 95% Wilson intervals over
+Success rate is the fraction of episodes that reach the goal; brackets are 95% Wilson intervals over
 episodes pooled across the 3 training seeds per variant. Every number here comes from the generated
 result sections under [Detailed results](#detailed-results), which carry their commands, seeds, and
 commits.
 
-- **Nominal.** The baseline reaches a pooled Success_Rate of 0.973 [0.967, 0.978] over 3072
+- **Nominal.** The baseline reaches a pooled success rate of 0.973 [0.967, 0.978] over 3072
   episodes, above the 0.80 target; the randomized variant reaches 0.949 [0.941, 0.956]. Randomization
   costs about 2.4 points at nominal parameters.
-- **Latency.** This is where randomization pays off. Outside the training range the baseline
-  collapses (3 steps: 0.543, 4 steps: 0.131 [0.119, 0.143], 6 steps: 0.053) while the randomized
-  variant holds 0.952 at 3 steps and 0.896 [0.885, 0.907] at 4, and falls to 0.398 at 6.
+- **Latency.** This is where randomization pays off. Latency is counted in 50 ms control steps, and
+  each grid value delays both the action and the observation, so 4 steps means 200 ms on each. Beyond
+  the randomized range [0, 2] the baseline collapses (3 steps: 0.543, 4 steps: 0.131 [0.119, 0.143],
+  6 steps: 0.053) while the randomized variant holds 0.952 at 3 steps and 0.896 [0.885, 0.907] at 4,
+  and falls to 0.398 at 6.
 - **Mass and friction.** Across mass x0.5 to x2.0 and wheel friction x0.3 to x1.5, including values
   outside the training ranges, both variants stay within about 1 point of their own nominal rates,
   and the baseline stays 1.1 to 2.4 points ahead in every cell, so randomization buys nothing there.
   A likely reason (not tested separately) is that the velocity-controlled wheels have torque to spare,
   so mass and friction change little about how the robot moves.
-- **Transfer to Unreal.** On the same 150 episodes per variant, the in-game Success_Rate is 0.980
-  (baseline) and 0.940 (randomized) against 0.993 and 0.953 in MuJoCo: a Transfer_Gap of +0.013 for
-  both. The gap is small for both variants and randomization does not reduce it; with 150 episodes the
-  per-engine intervals are 5 to 8 points wide, so the two gaps are not distinguishable.
+- **Transfer to Unreal.** On the same 150 episodes per variant, the in-game success rate is 0.980
+  (baseline) and 0.940 (randomized) against 0.993 and 0.953 in MuJoCo: a transfer gap of +0.013 for
+  both, which is 2 of 150 episodes (in each variant 3 succeed only in MuJoCo and 1 only in the game;
+  exact McNemar p = 0.62). The gap is small for both variants and randomization does not reduce it;
+  with 150 episodes the per-engine intervals are 5 to 8 points wide, so the two gaps are not
+  distinguishable.
 
 ## What I built
 
@@ -58,7 +62,9 @@ commits.
   [`results/summary.md`](results/summary.md) from the raw result JSON, and the tool that copies those
   sections into this README.
 - **Export** ([`learned_opponents/export/`](learned_opponents/export)): ONNX export of each policy
-  and a parity test (Python policy vs ONNX Runtime, tolerance 1e-4).
+  and a parity test (Python policy vs ONNX Runtime, tolerance 1e-4). CI runs the fixture version,
+  which checks ONNX Runtime against the Python-policy actions saved by the same export run, because
+  the training checkpoints the live check needs are not committed.
 - **Unreal Engine 5.8 game in C++** ([`game/LearnedOpponents/Source/`](game/LearnedOpponents/Source/LearnedOpponents)):
   an observation builder that mirrors the Python spec, NNE inference, a kinematic robot with swept
   collision, the race manager and HUD, a headless transfer harness, and automation tests.
@@ -85,9 +91,9 @@ commits.
   action and observation latency [0, 2] control steps.
 - **Training** ([`config/train.yaml`](config/train.yaml)): rsl-rl PPO, a 256x256 ELU MLP with a Beta
   action distribution (support exactly [-1, 1]) and learned observation normalization; the same
-  budget (30,081,024 environment steps, 306 PPO iterations, about 4-7 minutes per run) and
-  hyperparameters for both variants, 3 seeds each. The budget comes from a pilot run on a separate
-  seed (below).
+  budget (30,081,024 environment steps, 306 PPO iterations, 3.7 to 6.8 minutes per run; see
+  [Training runs](#training-runs)) and hyperparameters for both variants, 3 seeds each. The budget
+  comes from a pilot run on a separate seed (below).
 - **Evaluation**: deterministic actions on 1024 fixed layouts per training seed, pooled over 3 seeds
   (Wilson intervals for rates, t intervals for times); the robustness grid varies one parameter at a
   time with the others nominal.
@@ -144,6 +150,7 @@ Evaluation reproducibility: each checkpoint was evaluated 3 times on the same ev
 ## Robustness at a glance
 
 - Command: `python -m learned_opponents.eval.robustness `; commit `cb4144d8fab1d871d070eace89e18591aaed3b11`; evaluation seed 20261017; 1024 episodes per training seed per cell, pooled over 3 seeds per variant (full table with collision rates, times, and per-seed rates under "Robustness grid").
+- Latency is counted in control steps of 50 ms, and one value delays both the action and the observation queue; training draws each queue's delay separately from [0, 2] steps.
 
 | Parameter | Value | Range | Baseline Success_Rate [95% CI] | Randomized Success_Rate [95% CI] | Randomized - baseline |
 | --- | --- | --- | --- | --- | --- |
@@ -181,11 +188,12 @@ The full grid (collision rates, times to goal, per-seed rates) is in [`results/s
 - Commit: `9aed9521952e633b73c8b7c76e2a76aa190063da`
 - 50 layouts from `results/transfer/episodes.json` (layout seed 50505) x 3 training seeds per variant, nominal parameters, deterministic actions; the game runs headless and steps each episode at control_dt_s.
 - Transfer_Gap = MuJoCo Success_Rate - in-game Success_Rate on the same episodes, reported as measured (nothing tuned to shrink it).
+- The episodes are paired, so the gap equals (successes only in MuJoCo - successes only in the game) / episodes; the p-value is a two-sided exact McNemar test on those discordant episodes.
 
-| Variant | Episodes | MuJoCo Success_Rate [95% CI] | In-game Success_Rate [95% CI] | Transfer_Gap | In-game Collision_Rate [95% CI] |
-| --- | --- | --- | --- | --- | --- |
-| baseline | 150 | 0.993 [0.963, 0.999] | 0.980 [0.943, 0.993] | +0.013 | 0.013 [0.004, 0.047] |
-| randomized | 150 | 0.953 [0.907, 0.977] | 0.940 [0.890, 0.968] | +0.013 | 0.040 [0.018, 0.085] |
+| Variant | Episodes | MuJoCo Success_Rate [95% CI] | In-game Success_Rate [95% CI] | Transfer_Gap | Success only in MuJoCo / only in game | McNemar p | In-game Collision_Rate [95% CI] |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| baseline | 150 | 0.993 [0.963, 0.999] | 0.980 [0.943, 0.993] | +0.013 | 3 / 1 | 0.62 | 0.013 [0.004, 0.047] |
+| randomized | 150 | 0.953 [0.907, 0.977] | 0.940 [0.890, 0.968] | +0.013 | 3 / 1 | 0.62 | 0.040 [0.018, 0.085] |
 <!-- END summary:Transfer check (MuJoCo vs Unreal, same layouts) -->
 
 <!-- BEGIN summary:Training budget selection (pilot, never reported as a result) -->
@@ -238,6 +246,25 @@ Earlier pilot evidence (stopped runs and why): `docs/evidence/pilot/README.md`, 
 Measured training reproducibility tolerance on this GPU (absolute difference in nominal Success_Rate between the two runs): **0.004**.
 <!-- END summary:Training reproducibility (pilot, never reported as a result) -->
 
+<!-- BEGIN summary:Training runs -->
+## Training runs
+
+- Command: `python -m learned_opponents.eval.training_runs` (collects `runs/<variant>/seed<seed>/summary.json` written by `python -m learned_opponents.train`)
+- Commit: `c37b932fa1e7f4a44f820caad00e11753fc8cc3c`
+- Wall time covers the whole run on one GPU: simulation, PPO updates, and logging.
+
+| Variant | Seed | Training commit | Iterations | Env steps | Wall time | Env steps/s |
+| --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 3.7 min | 134,711 |
+| baseline | 1 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 5.8 min | 87,040 |
+| baseline | 2 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 6.5 min | 76,894 |
+| randomized | 0 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 4.3 min | 115,386 |
+| randomized | 1 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 6.4 min | 78,051 |
+| randomized | 2 | `aaea9496f2538fe1bcc4d4b1c093d275bdf34f1f` | 306 | 30,081,024 | 6.8 min | 73,458 |
+
+Wall time per run: 3.7 to 6.8 min over 6 runs.
+<!-- END summary:Training runs -->
+
 ## Running it
 
 ### Without a GPU (a few minutes)
@@ -253,7 +280,7 @@ python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-ci.txt && pip install --no-deps -e .
 
 pytest -m "not gpu"                                         # unit and property tests (GPU tests skip)
-python -m learned_opponents.export.parity --fixtures-only   # the six committed ONNX models reproduce the saved policy actions
+python -m learned_opponents.export.parity --fixtures-only   # the six committed ONNX models reproduce the Python-policy actions saved at export
 python -m learned_opponents.eval.summary                    # re-derive results/summary.md from results/eval/*.json ...
 git diff --exit-code results/summary.md                     # ... and confirm it is unchanged
 python -m learned_opponents.eval.readme --check             # the README's result sections match results/summary.md
@@ -272,6 +299,7 @@ the game needs Unreal Engine 5.8 on Windows. Machine setup, exact versions, and 
 | Project environment | GPU | `bash scripts/make_project_venv.sh` |
 | Pilot budget and reproducibility | GPU | `bash scripts/pilot_curve.sh`, then `bash scripts/pilot_repro.sh` |
 | All six training runs | GPU | `bash scripts/train_all.sh` (one run: `python -m learned_opponents.train --variant baseline --seed 0`) |
+| Training wall-time table | the training runs' `runs/*/seed*/summary.json` | `python -m learned_opponents.eval.training_runs` |
 | Nominal evaluation | GPU | `python -m learned_opponents.eval.robustness --nominal --variants baseline randomized --repeats 2` |
 | Robustness grid, plots, summary | GPU | `python -m learned_opponents.eval.robustness` |
 | ONNX export and parity fixtures | trained checkpoints (not committed) | `python -m learned_opponents.export.to_onnx --all` |
@@ -287,13 +315,15 @@ the game needs Unreal Engine 5.8 on Windows. Machine setup, exact versions, and 
 | --- | --- |
 | Full Python suite (WSL, GPU tests included) | `~/.venvs/learned-opponents/bin/python -m pytest` |
 | CI suite (no GPU; GitHub Actions runs it on every push) | `pytest -m "not gpu"` |
-| Parity, Python policy vs ONNX Runtime, all six models | `python -m learned_opponents.export.parity` |
+| Parity, live Python policy vs ONNX Runtime, all six models (needs the uncommitted training checkpoints) | `python -m learned_opponents.export.parity` |
 | Unreal automation tests (observation builder, traced ranges, kinematics, NNE parity) | `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_ue_tests.ps1` |
 
 Property-based tests (Hypothesis, 100-300 examples each) cover the observation and action layout,
 reset, termination, reward, randomization ranges and reproducibility, confidence intervals, the
 grid's out-of-range values, ONNX parity, and the transfer gap; the C++ observation builder is checked
-against 128 Python-generated cases.
+against 128 Python-generated cases. The MuJoCo Warp environment itself (physics, ray sensing, and the
+latency queues) is tested only in the GPU suite, because it needs the training stack; CI covers the
+GPU-free modules.
 
 ## Repository layout
 
@@ -324,6 +354,10 @@ docs/                    ENVIRONMENT.md (machine and versions), evidence logs, B
 - **Different dynamics in the game.** The in-game robot is kinematic, so mass, friction, and motor
   strength have no in-game counterpart, and its velocity observation is the commanded velocity, with
   none of MuJoCo's acceleration lag; the gap mixes raycast, collision, and dynamics differences.
+- **Collision is checked differently.** MuJoCo checks for contact once per 50 ms control step, at the
+  robot's position after the physics substeps; the game sweeps the robot's shape through every
+  substep. A brief graze inside a control step can therefore end an episode in the game but not in
+  MuJoCo, which contributes to the transfer gap.
 - **Small transfer sample.** 150 in-game episodes per variant give intervals 5 to 8 points wide, so
   gaps of this size (+0.013) cannot be told apart between the variants.
 - **Determinism is bounded.** MuJoCo Warp accumulates with floating-point atomics, so repeated GPU
