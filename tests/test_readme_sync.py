@@ -28,3 +28,10 @@ def test_unknown_section_is_left_alone():
     text = "<!-- BEGIN summary:Gamma -->\nkeep\n<!-- END summary:Gamma -->\n"
     new, missing = readme.sync(text, SUMMARY)
     assert new == text and missing == ["Gamma"]
+
+
+def test_committed_readme_blocks_match_committed_summary():
+    # The README's result blocks are copies of results/summary.md; after regenerating the
+    # summary, run `python -m learned_opponents.eval.readme` to refresh them.
+    text = readme.README.read_text(encoding="utf-8")
+    assert readme.check(text, readme.SUMMARY.read_text(encoding="utf-8")) == []
