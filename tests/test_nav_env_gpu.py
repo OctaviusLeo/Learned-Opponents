@@ -58,9 +58,12 @@ def test_scripted_episodes_end_with_the_right_reason(gpu_env, task):
     k = gpu_env.k
     empty = (np.zeros(k), np.zeros((k, 2)), np.zeros(k))
     # Drive straight at a box 2 m ahead: collision when the footprint reaches it.
-    kind = np.zeros(k); kind[0] = ob.BOX
-    center = np.zeros((k, 2)); center[0] = (1.0, 0.0)
-    size = np.zeros(k); size[0] = 0.6
+    kind = np.zeros(k)
+    kind[0] = ob.BOX
+    center = np.zeros((k, 2))
+    center[0] = (1.0, 0.0)
+    size = np.zeros(k)
+    size[0] = 0.6
     _single_episode(gpu_env, kind, center, size, (-1.0, 0.0, 0.0), (3.0, 0.0))
     reasons = _run(gpu_env, lambda: torch.full((gpu_env.num_envs, 2), 0.6, device="cuda"))
     assert set(reasons.values()) == {rules.COLLISION}

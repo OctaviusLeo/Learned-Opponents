@@ -34,11 +34,11 @@ wp.config.quiet = True  # before mjlab imports initialize Warp
 from mjlab.sim.sim import MujocoCfg, Simulation, SimulationCfg  # noqa: E402
 
 from learned_opponents.env import obstacles as obs_lib  # noqa: E402
-from learned_opponents.env import rules
-from learned_opponents.env import torch_xp as txp
-from learned_opponents.env.model import box_body, build_mjcf, cyl_body, PARK_Z
-from learned_opponents.randomization import domain_rand as dr
-from learned_opponents.spec import obs_action_spec as spec
+from learned_opponents.env import rules  # noqa: E402
+from learned_opponents.env import torch_xp as txp  # noqa: E402
+from learned_opponents.env.model import box_body, build_mjcf, cyl_body, PARK_Z  # noqa: E402
+from learned_opponents.randomization import domain_rand as dr  # noqa: E402
+from learned_opponents.spec import obs_action_spec as spec  # noqa: E402
 
 DR_FIELDS = ("body_mass", "body_inertia", "geom_friction", "actuator_gainprm",
              "actuator_biasprm", "actuator_forcerange", "geom_size")

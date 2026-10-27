@@ -18,6 +18,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Ruff (rules in pyproject.toml)
+        run: pipx run --spec ruff==0.17.3 ruff check --output-format=github .
+
   test:
     runs-on: ubuntu-latest
     steps:
