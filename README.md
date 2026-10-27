@@ -1,5 +1,8 @@
 # Learned Opponents
 
+[![CI](https://github.com/OctaviusLeo/Learned-Opponents/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/OctaviusLeo/Learned-Opponents/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Reinforcement-learning navigation for a differential-drive robot, trained in a GPU-parallel physics
 simulator and shipped as the opponent in an Unreal Engine 5.8 game.
 
@@ -315,6 +318,8 @@ the game needs Unreal Engine 5.8 on Windows. Machine setup, exact versions, and 
 | --- | --- |
 | Full Python suite (WSL, GPU tests included) | `~/.venvs/learned-opponents/bin/python -m pytest` |
 | CI suite (no GPU; GitHub Actions runs it on every push) | `pytest -m "not gpu"` |
+| Lint (CI; rules in `pyproject.toml`) | `pipx run --spec ruff==0.17.3 ruff check .` |
+| Parity, saved Python-policy actions vs ONNX Runtime, every fixture of all six models (no GPU; CI) | `python -m learned_opponents.export.parity --fixtures-only` |
 | Parity, live Python policy vs ONNX Runtime, all six models (needs the uncommitted training checkpoints) | `python -m learned_opponents.export.parity` |
 | Unreal automation tests (observation builder, traced ranges, kinematics, NNE parity) | `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_ue_tests.ps1` |
 
