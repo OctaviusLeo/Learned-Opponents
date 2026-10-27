@@ -1,6 +1,7 @@
 name: CI
 
-# Runs the GPU-free pytest suite on every push (all branches) and pull request.
+# Runs ruff, the GPU-free pytest suite, and the ONNX parity fixture check on
+# every push (all branches) and pull request.
 # Training, the GPU environment tests (marked `gpu`), and the Unreal game run
 # locally on the RTX 3080 desktop; their results are recorded with command,
 # seed, and commit. A failing test fails the job (no `|| true`).
@@ -46,3 +47,7 @@ jobs:
 
       - name: Run pytest (GPU-free tests)
         run: pytest -m "not gpu"
+
+      # pytest samples parity observations; this checks all of them for all six models.
+      - name: ONNX parity on every saved fixture (all six committed models)
+        run: python -m learned_opponents.export.parity --fixtures-only
