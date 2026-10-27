@@ -1,0 +1,9 @@
+# Keeps the GitHub Actions in .github/workflows current. Python packages are
+# left out on purpose: they are exact pins shared with requirements-gpu.lock and
+# the recorded results, so they change only together with a re-run.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
