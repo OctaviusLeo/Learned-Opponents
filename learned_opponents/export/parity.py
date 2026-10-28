@@ -119,7 +119,8 @@ def mismatch_demo() -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m learned_opponents.export.parity")
     ap.add_argument("--fixtures-only", action="store_true", help="saved actions vs ONNX only (no torch)")
-    ap.add_argument("--mismatch-demo", action="store_true")
+    ap.add_argument("--mismatch-demo", action="store_true",
+                    help="perturb one weight of the first model; exits 0 only if parity catches it")
     args = ap.parse_args(argv)
     if args.mismatch_demo:
         return mismatch_demo()

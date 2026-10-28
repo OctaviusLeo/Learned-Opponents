@@ -133,7 +133,8 @@ def main(argv=None) -> int:
     ap.add_argument("--checkpoint", type=Path, help="run directory holding checkpoint.pt and config.yaml")
     ap.add_argument("--out", type=Path, help="output .onnx path")
     ap.add_argument("--all", action="store_true", help="export all six reported runs with parity fixtures")
-    ap.add_argument("--allow-dirty", action="store_true")
+    ap.add_argument("--allow-dirty", action="store_true",
+                    help="with --all, export from uncommitted changes; development only, never for reported models")
     args = ap.parse_args(argv)
     if args.all:
         return export_all(args.allow_dirty)
