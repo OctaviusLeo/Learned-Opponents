@@ -10,8 +10,8 @@ library only; no GPU.
 
 from __future__ import annotations
 
+import argparse
 import json
-import sys
 from typing import Sequence
 
 from learned_opponents import config as cfglib
@@ -34,9 +34,14 @@ def collect(allow_dirty: bool = False) -> dict:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    argv = list(sys.argv[1:] if argv is None else argv)
+    ap = argparse.ArgumentParser(prog="python -m learned_opponents.eval.training_runs",
+                                 description="Collect the reported training runs' budgets and wall times "
+                                             "into results/eval/training_runs.json.")
+    ap.add_argument("--allow-dirty", action="store_true",
+                    help="collect from an uncommitted tree; development only, never for reported results")
+    args = ap.parse_args(argv)
     path = EVAL_DIR / "training_runs.json"
-    write_json(path, collect(allow_dirty="--allow-dirty" in argv))
+    write_json(path, collect(allow_dirty=args.allow_dirty))
     print(path)
     return 0
 

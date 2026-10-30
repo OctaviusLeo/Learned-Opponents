@@ -11,9 +11,10 @@ compares the same tasks.
 
 from __future__ import annotations
 
+import argparse
 import json
-import sys
 import time
+from typing import Sequence
 
 from learned_opponents import config as cfglib
 from learned_opponents.env import obstacles as ob
@@ -92,13 +93,23 @@ def summarize(allow_dirty: bool) -> int:
     return 0
 
 
+def main(argv: Sequence[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="python -m learned_opponents.eval.transfer",
+                                 description="Transfer check, Python side; scripts/run_transfer.ps1 runs the "
+                                             "three steps in order.")
+    ap.add_argument("command", choices=("episodes", "mujoco", "summarize"),
+                    help="episodes: write the 50 layouts; mujoco: play them with the six policies; "
+                         "summarize: pair them with the game results into results/summary.md")
+    ap.add_argument("--allow-dirty", action="store_true",
+                    help="mujoco and summarize only: report from an uncommitted tree; development only, "
+                         "never for reported results")
+    args = ap.parse_args(argv)
+    if args.command == "episodes":
+        return episodes()
+    if args.command == "mujoco":
+        return mujoco(args.allow_dirty)
+    return summarize(args.allow_dirty)
+
+
 if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else ""
-    allow = "--allow-dirty" in sys.argv
-    if cmd == "episodes":
-        raise SystemExit(episodes())
-    if cmd == "mujoco":
-        raise SystemExit(mujoco(allow))
-    if cmd == "summarize":
-        raise SystemExit(summarize(allow))
-    raise SystemExit("usage: python -m learned_opponents.eval.transfer {episodes|mujoco|summarize} [--allow-dirty]")
+    raise SystemExit(main())
