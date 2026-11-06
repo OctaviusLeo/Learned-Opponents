@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from learned_opponents.eval import training_runs, transfer
+from learned_opponents.eval import readme, training_runs, transfer
 
 
 @pytest.mark.parametrize("module", [training_runs, transfer])
@@ -35,3 +35,11 @@ def test_transfer_dispatches_commands_and_rejects_unknown(monkeypatch):
     with pytest.raises(SystemExit) as exc:
         transfer.main(["bogus"])
     assert exc.value.code == 2
+
+
+@pytest.mark.parametrize("argv", [["--help"], ["--chek"]])
+def test_readme_help_and_unknown_flags_never_rewrite(argv, monkeypatch):
+    monkeypatch.setattr(readme, "sync", lambda *a: pytest.fail("README would be rewritten"))
+    with pytest.raises(SystemExit) as exc:
+        readme.main(argv)
+    assert exc.value.code == (0 if argv == ["--help"] else 2)

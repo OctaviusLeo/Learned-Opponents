@@ -10,6 +10,7 @@ number, with its command, seeds, and commit. Standard library only.
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -58,9 +59,13 @@ def check(readme_text: str, summary_text: str) -> list[str]:
 
 
 def main(argv: list[str]) -> int:
+    ap = argparse.ArgumentParser(prog="python -m learned_opponents.eval.readme",
+                                 description="Copy result sections from results/summary.md into README.md.")
+    ap.add_argument("--check", action="store_true", help="exit 1 if any README block differs; write nothing")
+    args = ap.parse_args(argv)
     readme = README.read_text(encoding="utf-8")
     summary = SUMMARY.read_text(encoding="utf-8")
-    if "--check" in argv:
+    if args.check:
         problems = check(readme, summary)
         for p in problems:
             print("FAIL", p)
