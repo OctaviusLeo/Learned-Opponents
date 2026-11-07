@@ -17,9 +17,9 @@ reaches the target, the best checkpoint is used and the shortfall is reported.
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
-import sys
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -126,8 +126,15 @@ def repro() -> int:
     return 0
 
 
+def main(argv: Sequence[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="python -m learned_opponents.train.pilot",
+                                 description="Pilot evaluation of the baseline variant, seed 100 (task 8.3).")
+    ap.add_argument("command", choices=("curve", "repro"),
+                    help="curve: pick the training budget from runs/pilot/curve; "
+                         "repro: compare runs/pilot/repro_a and repro_b")
+    args = ap.parse_args(argv)
+    return curve() if args.command == "curve" else repro()
+
+
 if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else ""
-    if cmd not in ("curve", "repro"):
-        raise SystemExit("usage: python -m learned_opponents.train.pilot {curve|repro}")
-    raise SystemExit(curve() if cmd == "curve" else repro())
+    raise SystemExit(main())

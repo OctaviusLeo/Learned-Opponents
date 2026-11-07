@@ -63,3 +63,18 @@ def test_pilot_budget_rule():
     assert low["chosen_env_steps"] == 2e7 and not low["meets_target"]
     with pytest.raises(ValueError):
         choose_budget(pts[4:], target=0.8, max_minutes=60)
+
+
+def test_pilot_cli_dispatches_and_rejects_unknown(monkeypatch, capsys):
+    from learned_opponents.train import pilot
+
+    monkeypatch.setattr(pilot, "curve", lambda: 11)
+    monkeypatch.setattr(pilot, "repro", lambda: 12)
+    assert pilot.main(["curve"]) == 11 and pilot.main(["repro"]) == 12
+    with pytest.raises(SystemExit) as exc:
+        pilot.main(["--help"])
+    assert exc.value.code == 0 and "repro_a" in capsys.readouterr().out
+    for argv in ([], ["bogus"]):
+        with pytest.raises(SystemExit) as exc:
+            pilot.main(argv)
+        assert exc.value.code == 2

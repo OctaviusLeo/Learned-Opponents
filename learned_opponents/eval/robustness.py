@@ -104,7 +104,8 @@ def evaluate_nominal(variants: Sequence[str], repeats: int, allow_dirty: bool) -
 def main(argv: Sequence[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m learned_opponents.eval.robustness")
     ap.add_argument("--nominal", action="store_true", help="nominal-parameter evaluation only")
-    ap.add_argument("--variants", nargs="+", choices=["baseline", "randomized"])
+    ap.add_argument("--variants", nargs="+", choices=["baseline", "randomized"],
+                    help="variants to evaluate (default: baseline with --nominal, both for the full grid)")
     ap.add_argument("--repeats", type=int, default=0,
                     help="extra identical evaluations per checkpoint to measure evaluation reproducibility")
     ap.add_argument("--allow-dirty", action="store_true", help="development only; never for reported numbers")
