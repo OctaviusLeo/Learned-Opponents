@@ -328,7 +328,8 @@ reset, termination, reward, randomization ranges and reproducibility, confidence
 grid's out-of-range values, ONNX parity, and the transfer gap; the C++ observation builder is checked
 against 128 Python-generated cases. The MuJoCo Warp environment itself (physics, ray sensing, and the
 latency queues) is tested only in the GPU suite, because it needs the training stack; CI covers the
-GPU-free modules.
+GPU-free modules. The checks to run before a commit and the rules for generated files are in
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Repository layout
 
